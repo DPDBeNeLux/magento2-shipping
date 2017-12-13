@@ -2,7 +2,7 @@
     "name": "dpdbenelux/magento2-shipping",
     "description": "A Magento 2 shipping method",
     "require": {
-      "php": "~5.6.5"
+      "php": ">=5.6.5"
     },
     "type": "magento2-module",
     "version": "1.0.0",
