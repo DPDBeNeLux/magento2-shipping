@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
+ *
+ * Copyright (C) 2017  DPD Nederland B.V.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+$parcelshop = $this->getParcelshop();
+$quote = $this->getQuote();
+$dpdExtraInfoDecoded = json_decode($parcelshop['extra_info']);
+?>
+<div id="map_canvas" class="gmaps" style="height: 430px; width: 600px; position: relative; overflow: hidden;">
+	<div id="parcelshop" class="parcelshopwrapper">
+		<div class="dpd-shop-header">
+			<div class="dpd-shop-logo">
+				<img
+						src="<?php echo $this->getViewFileUrl('DPDBenelux_Shipping::images/dpd_parcelshop_logo.png') ?>"
+						alt="shop logo"/>
+			</div>
+			<div class="dpd-shop-address">
+				<p class="dpd-text"><b><?php echo $quote->getDpdCompany() ?></b></p>
+				<p class="dpd-text"><?php echo $quote->getDpdStreet() ?></p>
+				<p class="dpd-text"><?php echo $quote->getDpdZipcode() . " " . $quote->getDpdCity() ?></p>
+				<p class="dpd-text"><?php echo $this->getCountry($quote->getDpdCountry()); ?></p>
+			</div>
+		</div>
+		<div class="dpd-shop-openinghours">
+			<?php if ($extraInfoArray = get_object_vars($dpdExtraInfoDecoded)): ?>
+				<?php foreach ($extraInfoArray as $key => $dpdExtraInfo): ?>
+					<p class="dpd-shop-openinghours-name"><?php echo __($key); ?></p>
+					<?php if ($key == "Opening hours"): ?>
+						<div class="dpd-shop-openinghours-table">
+							<?php echo $this->getOpeningHoursHtml($dpdExtraInfo) ?>
+						</div>
+					<?php else: ?>
+						<div class="std"><?php echo $dpdExtraInfo ?></div>
+					<?php endif; ?>
+				<?php endforeach ?>
+			<?php endif; ?>
+		</div>
+		<div class="dpd-shop-change">
+			<a href="#" class="invalidateParcel"><?php echo __('Click here to change your ParcelShop'); ?></a>
+			<input type="hidden" class="DPD-confirmed" value="1"/>
+			<input type="hidden" class="parcelshopId" value="<?php echo $quote->getDpdParcelshopId() ?>" />
+		</div>
+	</div>
+</div>
+<style>
+	.dpd-shop-header {
+		height: 100px;
+	}
+	.dpd-shop-logo {
+		display: inline-block;
+	}
+	.dpd-shop-address {
+		display: inline-block;
+		padding-left: 5px;
+	}
+	.dpd-text {
+		margin: 0px;
+	}
+	.dpd-shop-openinghours-name {
+		font-size: 1.1em;
+		font-weight: bold;
+		margin-top: 10px;
+		margin-bottom: 5px;
+	}
+</style>

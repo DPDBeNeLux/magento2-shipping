@@ -1,0 +1,62 @@
+.dpd-shipping .admin__page-nav-link {
+    padding: 2rem 1rem 2rem 1rem;
+
+}
+#dpdshipping_account_settings::before{
+    width: 100px;
+    height: 60px;
+    margin-right: 20px;
+    float: right ;
+    background-image: url(../images/dpd-logo-transparant.png) ;
+    background-size: 100px ;
+    background-repeat: no-repeat;
+    content: ' ';
+    margin-top: -20px;
+}
+
+#carriers_dpdpredict::before{
+    width: 100px;
+    height: 60px;
+    margin-right: 20px;
+    float: right ;
+    background-image: url(../images/dpd-logo-transparant.png) ;
+    background-size: 100px ;
+    background-repeat: no-repeat;
+    content: ' ';
+    margin-top: 10px;
+}
+#carriers_dpdpickup::before{
+    width: 100px;
+    height: 60px;
+    margin-right: 20px;
+    float: right ;
+    background-image: url(../images/dpd-logo-transparant.png) ;
+    background-size: 100px ;
+    background-repeat: no-repeat;
+    content: ' ';
+    margin-top: 10px;
+}
+#dpdshipping_account_settings{
+    margin-top: 40px;
+}
+
+.dpd-shipping .admin__page-nav-link:after {
+    float: right ;
+    width: 80px;
+    height: 50px;
+    margin-top:-6px;
+    margin-right: -25px ;
+
+    background-image: url(../images/dpd-logo-transparant.png);
+    background-size: 60px;
+    background-repeat:no-repeat;
+    content: '';
+}
+
+@media screen and (max-width: 1119px ){
+
+    .dpd-shipping .admin__page-nav-link:after{
+        display: none;
+    }
+
+}

@@ -1,0 +1,20 @@
+<!-- ko if: initializeDpdShopInfo() -->
+<!-- /ko -->
+<div class="dpd-shipping-information" style="display: none;">
+    <div class="dpd-shipping-info">
+        <div class="shipping-information-title">
+            <span data-bind="i18n: 'DPD Parcelshop:'"></span>
+        </div>
+        <div class="shipping-information-content">
+            <p id="dpd_company"></p>
+            <p id="dpd_street"></p>
+            <p id="dpd_zipcode_and_city"></p>
+            <p id="dpd_country"></p>
+        </div>
+    </div>
+</div>
+<style>
+    .dpd-shipping-information p {
+        margin-bottom: 3px;
+    }
+</style>

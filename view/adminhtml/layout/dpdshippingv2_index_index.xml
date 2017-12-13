@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+ This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
+
+ Copyright (C) 2017  DPD Nederland B.V.
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+	<head>
+        <title>DPD Shipping module</title>
+
+        <css src="DPDBenelux_Shipping::css/dpd_adminhtml.css"/>
+		<script src="DPDBenelux_Shipping::js/js.js"/>
+		<css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+		<script src="path/file.js" defer="defer"/>
+		<link src="http://url.com" src_type="url"/>
+		<remove src="path/remove/file.css"/>
+
+    </head> 
+	<body>
+        <referenceContainer name="content">
+            <block class="DPDBenelux\Shipping\Block\Adminhtml\Index\Index" name="dpdshipping_block_adminhtml_index_index"  template="DPDBenelux_Shipping::dpdshipping_index_index.phtml" />
+        </referenceContainer>
+    </body>
+</page>
