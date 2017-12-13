@@ -1,5 +1,5 @@
 {
-    "name": "DPDBeNeLux/magento2-shipping",
+    "name": "dpdbenelux/magento2-shipping",
     "description": "A Magento 2 shipping method",
     "require": {
       "php": "~5.6.5"
