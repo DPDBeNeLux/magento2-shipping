@@ -124,8 +124,6 @@ class Index extends \Magento\Framework\App\Action\Action
 
 		foreach($parcelShops as $shop)
 		{
-			if($shop->isoAlpha2 != 'NL')
-				continue;
 			$parcelShop = array();
 			$parcelShop['parcelShopId'] = $shop->parcelShopId;
 			$parcelShop['company'] = trim($shop->company);
