@@ -23,7 +23,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 
 class DPDClient extends AbstractHelper
 {
-	const DPD_CONFIG_SERVICE_MODE = 'dpdshipping/account_settings/account_settings_mode/mode_type';
+	const DPD_CONFIG_SERVICE_MODE = 'dpdshipping/account_settings/mode_type';
 
 	const DPD_LOGIN_SERVICE_URL = 'LoginService.svc?singleWsdl';
 	const DPD_SHIPMENT_SERVICE_URL = 'ShipmentService.svc?singleWsdl';
