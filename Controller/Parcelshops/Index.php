@@ -54,7 +54,7 @@ class Index extends \Magento\Framework\App\Action\Action
 	}
 
 
-	public function getGoogleMapsCenter($street, $postcode, $countryId)
+	public function getGoogleMapsCenter($postcode, $countryId)
 	{
 		try
 		{
@@ -96,14 +96,14 @@ class Index extends \Magento\Framework\App\Action\Action
 
 		$post = $this->getRequest()->getPostValue();
 
-		if(!isset($post['street']) || !isset($post['postcode']) || !isset($post['countryId']))
+		if(!isset($post['postcode']) || !isset($post['countryId']))
 		{
 			$resultData['success'] = false;
 			$resultData['error_message'] = __('No address found');
 			return $result->setData($resultData);
 		}
 
-		$coordinates = $this->getGoogleMapsCenter($post['street'], $post['postcode'], $post['countryId']);
+		$coordinates = $this->getGoogleMapsCenter($post['postcode'], $post['countryId']);
 		if($coordinates == null)
 		{
 			$resultData['success'] = false;
