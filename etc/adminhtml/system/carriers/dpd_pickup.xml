@@ -18,9 +18,9 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="dpdpickup" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+    <group id="dpdpickup" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>DPD Pickup</label>
-        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="title" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Title</label>
         </field>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">

@@ -21,6 +21,7 @@
     <section id="carriers" translate="label" type="text" sortOrder="320" showInDefault="1" showInWebsite="1" showInStore="1">
 
         <include path="DPDBenelux_Shipping::system/carriers/dpd_predict.xml"/>
+        <include path="DPDBenelux_Shipping::system/carriers/dpd_saturday.xml"/>
         <include path="DPDBenelux_Shipping::system/carriers/dpd_pickup.xml"/>
 
     </section>

@@ -73,21 +73,22 @@ class Data extends AbstractHelper
 		return $this->scopeConfig->getValue(self::DPD_GOOGLE_MAPS_API);
 	}
 
-	public function createShipment(Order $order, Order\Shipment $shipment = null)
+	public function createShipment(Order $order, $isDPDSaturdayOrder, Order\Shipment $shipment = null)
 	{
 		$includeReturnLabel = $this->scopeConfig->getValue('dpdshipping/account_settings/includeReturnLabel');
 
 		// Check if there's a problem with the session, if that's the case, reset the timestamp so we create a new one
 		try
 		{
-			$result = $this->dpdPredictService->storeOrders($order);
+
+			$result = $this->dpdPredictService->storeOrders($order, $isDPDSaturdayOrder);
 		}
 		catch(\Exception $ex)
 		{
 			if(strpos($ex->getMessage(), 'De client sessie is verlopen') !== false)
 			{
 				$this->configWriter->save('dpdshipping/accesstoken_created', 0);
-				$result = $this->dpdPredictService->storeOrders($order);
+				$result = $this->dpdPredictService->storeOrders($order, $isDPDSaturdayOrder);
 			}
 			else
 			{
@@ -97,7 +98,7 @@ class Data extends AbstractHelper
 
 		// If the return label option is enable we create a return label
 		if($includeReturnLabel)
-			$resultReturnLabel = $this->dpdPredictService->storeOrders($order, $includeReturnLabel);
+			$resultReturnLabel = $this->dpdPredictService->storeOrders($order, false, $includeReturnLabel);
 
 		// If this order doesn't have a shipment we create one
 		//if($order->getShipmentsCollection()->count() == 0)
@@ -193,6 +194,21 @@ class Data extends AbstractHelper
         $shippingMethod = $order->getShippingMethod();
 
         if($shippingMethod == 'dpdpickup_dpdpickup')
+        	return true;
+
+		return false;
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return bool
+     */
+    public function isDPDSaturdayOrder(Order $order)
+    {
+        $shippingMethod = $order->getShippingMethod();
+
+        if($shippingMethod == 'dpdsaturday_dpdsaturday')
         	return true;
 
 		return false;

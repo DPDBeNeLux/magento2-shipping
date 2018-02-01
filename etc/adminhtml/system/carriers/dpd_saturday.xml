@@ -19,34 +19,54 @@
 -->
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="dpdpredict" translate="label" type="text" sortOrder="-2" showInDefault="1" showInWebsite="1"
+    <group id="dpdsaturday" translate="label" type="text" sortOrder="-1" showInDefault="1" showInWebsite="1"
            showInStore="1">
-        <label>DPD Predict</label>
+        <label>DPD Saturday</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="0">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
-        <field id="name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+        <field id="name" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Method Name</label>
         </field>
-		<field id="rate_type" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
-			<label>Rate Type</label>
-			<source_model>DPDBenelux\Shipping\Config\Source\Settings\RateType</source_model>
-		</field>
+        <field id="rate_type" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Rate Type</label>
+            <source_model>DPDBenelux\Shipping\Config\Source\Settings\RateType</source_model>
+        </field>
         <field id="price" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Price</label>
             <validate>validate-number validate-zero-or-greater</validate>
-			<depends>
-				<field id="rate_type">flat</field>
-			</depends>
+            <depends>
+                <field id="rate_type">flat</field>
+            </depends>
+        </field>
+        <field id="shown_from_day" translate="label" type="select" sortOrder="42" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Show from day</label>
+            <source_model>DPDBenelux\Shipping\Config\Source\Settings\DaysInWeek</source_model>
+        </field>
+        <field id="shown_from_day_time" translate="label" type="text" sortOrder="43" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Show from time</label>
+            <comment>Time in 24h format</comment>
+        </field>
+        <field id="shown_till_day" translate="label" type="select" sortOrder="44" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Shown till day</label>
+            <source_model>DPDBenelux\Shipping\Config\Source\Settings\DaysInWeek</source_model>
+        </field>
+        <field id="shown_till_day_time" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Shown till time</label>
+            <comment>Time in 24h format</comment>
         </field>
         <field id="sort_order" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1"
                showInStore="0">
             <label>Sort Order</label>
         </field>
-        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
+        <field id="title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Title</label>
         </field>

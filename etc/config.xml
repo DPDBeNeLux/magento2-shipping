@@ -26,7 +26,7 @@
         </dpdshipping>
         <carriers>
             <dpdpredict>
-                <active>1</active>
+                <active>0</active>
 				<rate_type>flat</rate_type>
                 <sallowspecific>0</sallowspecific>
                 <model>DPDBenelux\Shipping\Model\Carrier\Dpdpredict</model>
@@ -37,8 +37,20 @@
                 <sort_order>0</sort_order>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
             </dpdpredict>
+            <dpdsaturday>
+                <active>0</active>
+				<rate_type>flat</rate_type>
+                <sallowspecific>0</sallowspecific>
+                <model>DPDBenelux\Shipping\Model\Carrier\DpdSaturday</model>
+                <name>DPD Saturday</name>
+                <price>00.00</price>
+                <title>Your shipment will be delivered on Saturday</title>
+                <type>I</type>
+                <sort_order>0</sort_order>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+            </dpdsaturday>
             <dpdpickup>
-                <active>1</active>
+                <active>0</active>
 				<rate_type>flat</rate_type>
                 <sallowspecific>0</sallowspecific>
                 <model>DPDBenelux\Shipping\Model\Carrier\Dpdpickup</model>
