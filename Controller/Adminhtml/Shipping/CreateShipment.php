@@ -84,7 +84,15 @@ class CreateShipment extends \Magento\Sales\Controller\Adminhtml\Order\AbstractM
 					$order = $shipment->getOrder();
 					if($this->dataHelper->isDPDPredictOrder($order))
 					{
-						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, $shipment));
+						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false, $shipment));
+					}
+					if($this->dataHelper->isDPDPickupOrder($order))
+					{
+						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false, $shipment));
+					}
+					if($this->dataHelper->isDPDSaturdayOrder($order))
+					{
+						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, true, $shipment));
 					}
 				}
 			}

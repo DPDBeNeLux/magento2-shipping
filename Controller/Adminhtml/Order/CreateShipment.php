@@ -92,12 +92,17 @@ class CreateShipment extends \Magento\Backend\App\Action
 
 				if($this->dataHelper->isDPDPredictOrder($order))
 				{
-					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order));
+					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false));
 				}
 
 				if($this->dataHelper->isDPDPickupOrder($order))
 				{
-					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order));
+					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false));
+				}
+
+				if($this->dataHelper->isDPDSaturdayOrder($order))
+				{
+					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, true));
 				}
 			}
 

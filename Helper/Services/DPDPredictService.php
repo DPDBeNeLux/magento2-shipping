@@ -47,9 +47,10 @@ class DPDPredictService extends AbstractHelper
 
 	/**
 	 * @param \Magento\Sales\Model\Order $order
+	 * @param bool $isDpdSaturday
 	 * @param bool $isReturn
 	 */
-	public function storeOrders(\Magento\Sales\Model\Order $order, $isReturn = false)
+	public function storeOrders(\Magento\Sales\Model\Order $order, $isDpdSaturday, $isReturn = false)
 	{
 		$accessToken = $this->authenticationService->getAccessToken();
 		$delisId = $this->authenticationService->getDelisId();
@@ -82,6 +83,7 @@ class DPDPredictService extends AbstractHelper
 				],
 				'productAndServiceData' => [
 					'orderType' => 'consignment',
+					'saturdayDelivery' => $isDpdSaturday,
 					'predict' => [
 						'channel' => 1,
 						'value' => $predictEmail,
