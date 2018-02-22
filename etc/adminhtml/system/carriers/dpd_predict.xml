@@ -35,7 +35,18 @@
 			<label>Rate Type</label>
 			<source_model>DPDBenelux\Shipping\Config\Source\Settings\RateType</source_model>
 		</field>
-        <field id="price" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="condition_name" translate="label" type="select" sortOrder="42" showInDefault="0" showInWebsite="1" showInStore="0" canRestore="1">
+            <label>Condition</label>
+            <source_model>Magento\OfflineShipping\Model\Config\Source\Tablerate</source_model>
+        </field>
+        <field id="export" translate="label" type="DPDBenelux\Shipping\Block\Adminhtml\TablerateExport" sortOrder="43" showInDefault="0" showInWebsite="1" showInStore="0">
+            <label>Export</label>
+        </field>
+        <field id="import" translate="label" type="DPDBenelux\Shipping\Block\Adminhtml\TablerateImport" sortOrder="44" showInDefault="0" showInWebsite="1" showInStore="0">
+            <label>Import</label>
+            <backend_model>DPDBenelux\Shipping\Model\Config\Tablerate</backend_model>
+        </field>
+        <field id="price" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Price</label>
             <validate>validate-number validate-zero-or-greater</validate>
 			<depends>

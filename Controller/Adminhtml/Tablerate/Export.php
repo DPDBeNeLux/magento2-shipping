@@ -67,12 +67,14 @@ class Export  extends \Magento\Config\Controller\Adminhtml\System\AbstractConfig
             'DPDBenelux\Shipping\Block\Adminhtml\Tablerate\Grid'
         );
         $website = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'));
+        $shippingMethod = $this->getRequest()->getParam('shipping_method');
+
         if ($this->getRequest()->getParam('conditionName')) {
             $conditionName = $this->getRequest()->getParam('conditionName');
         } else {
             $conditionName = $website->getConfig('carriers/tablerate/condition_name');
         }
-        $gridBlock->setWebsiteId($website->getId())->setConditionName($conditionName);
+        $gridBlock->setWebsiteId($website->getId())->setConditionName($conditionName)->setShippingMethod($shippingMethod);
         $content = $gridBlock->getCsvFile();
         return $this->_fileFactory->create($fileName, $content, DirectoryList::VAR_DIR);
     }

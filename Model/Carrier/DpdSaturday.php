@@ -232,6 +232,7 @@ class DpdSaturday extends \Magento\Shipping\Model\Carrier\AbstractCarrier implem
 			$request->setPackageWeight($request->getFreeMethodWeight());
 			$request->setPackageQty($oldQty - $freeQty);
 
+			$request->setShippingMethod('dpdsaturday');
 			$rate = $this->getRate($request);
 
 			$method->setPrice($rate['price']);

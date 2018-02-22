@@ -64,12 +64,12 @@ class AuthenticationService extends AbstractHelper
 		return $this->scopeConfig->getValue(self::DPD_ACCESSTOKEN_DEPOT);
 	}
 
-	public function getAccessToken()
+	public function getAccessToken($forceUpdate = false)
 	{
 		$accessTokenCreated = $this->scopeConfig->getValue(self::DPD_ACCESSTOKEN_CREATED);
 
 		// If the accesstoken is less than 12 hours old, use the cached one
-		if($accessTokenCreated > time() - 12 * 60 * 60)
+		if($accessTokenCreated > time() - 12 * 60 * 60 && !$forceUpdate)
 			return $this->scopeConfig->getValue(self::DPD_ACCESSTOKEN);
 
 		$username = $this->scopeConfig->getValue(self::DPD_USERNAME);

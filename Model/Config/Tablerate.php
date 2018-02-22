@@ -59,6 +59,10 @@ class Tablerate extends \Magento\Framework\App\Config\Value
      */
     public function afterSave()
     {
+    	if($this->_registry->registry('dpd_import_processed'))
+			return parent::afterSave();
+
+    	$this->_registry->register('dpd_import_processed', true);
         /** @var \DPDBenelux\Shipping\Model\ResourceModel\Tablerate $tableRate */
         $tableRate = $this->_tablerateFactory->create();
         $tableRate->uploadAndImport($this);

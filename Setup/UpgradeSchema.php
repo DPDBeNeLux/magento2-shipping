@@ -267,6 +267,51 @@ class UpgradeSchema implements UpgradeSchemaInterface
 				$setup->getConnection()->createTable($table);
 			}
 		}
+
+
+
+		if (version_compare($context->getVersion(), '1.0.6') < 0)
+		{
+			if ($connection->tableColumnExists($setup->getTable('dpd_shipping_tablerate'), 'shipping_method') === false)
+			{
+				// Code to upgrade to 1.0.6
+				$setup->getConnection()->addColumn(
+					$setup->getTable('dpd_shipping_tablerate'),
+					'shipping_method',
+					[
+						'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+						'length' => 150,
+						'nullable' => false,
+						'default' => 'dpdpredict',
+						'comment' => 'DPD shipping method name',
+					]
+				);
+			}
+
+			$oldIndexName = $setup->getIdxName(
+				'dpd_shipping_tablerate',
+				['website_id', 'dest_country_id', 'dest_region_id', 'dest_zip', 'condition_name', 'condition_value'],
+				\Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+			);
+
+			$newIndexName = $setup->getIdxName(
+				'dpd_shipping_tablerate',
+				['shipping_method', 'website_id', 'dest_country_id', 'dest_region_id', 'dest_zip', 'condition_name', 'condition_value'],
+				\Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+			);
+
+			$setup->getConnection()->dropIndex(
+				$setup->getTable('dpd_shipping_tablerate'),
+				$oldIndexName
+			);
+
+			$setup->getConnection()->addIndex(
+			$setup->getTable('dpd_shipping_tablerate'),
+				$newIndexName,
+				['shipping_method', 'website_id', 'dest_country_id', 'dest_region_id', 'dest_zip', 'condition_name', 'condition_value'],
+				\Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+			);
+		}
 		
         $setup->endSetup();
     }

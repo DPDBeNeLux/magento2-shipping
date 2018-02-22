@@ -201,7 +201,8 @@ class Dpdpredict extends \Magento\Shipping\Model\Carrier\AbstractCarrier impleme
 			
 			$request->setPackageWeight($request->getFreeMethodWeight());
 			$request->setPackageQty($oldQty - $freeQty);
-					
+			$request->setShippingMethod('dpdpredict');
+
 			$rate = $this->getRate($request);
 	 	 
 			$method->setPrice($rate['price']);

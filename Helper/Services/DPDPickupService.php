@@ -65,8 +65,16 @@ class DPDPickupService extends AbstractHelper
 			'consigneePickupAllowed' => 'true'
 		);
 
-
-		$result = $this->dpdClient->findParcelShopsByGeoData($parameters, $delisId, $accessToken);
+		try
+		{
+			$result = $this->dpdClient->findParcelShopsByGeoData($parameters, $delisId, $accessToken);
+		}
+		catch(\Exception $ex)
+		{
+			// retry once with a new access token
+			$accessToken = $this->authenticationService->getAccessToken(true);
+			$result = $this->dpdClient->findParcelShopsByGeoData($parameters, $delisId, $accessToken);
+		}
 		return $result->parcelShop;
 	}
 

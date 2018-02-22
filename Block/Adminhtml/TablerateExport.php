@@ -51,13 +51,18 @@ class TablerateExport extends \Magento\Framework\Data\Form\Element\AbstractEleme
         $buttonBlock = $this->getForm()->getParent()->getLayout()->createBlock(
             \Magento\Backend\Block\Widget\Button::class
         );
+
+		// get the group name
+		$groupId = $this->getContainer()['group']['id'];
+
         $params = ['website' => $buttonBlock->getRequest()->getParam('website')];
+        $params = ['shipping_method' => $groupId];
         $url = $this->_backendUrl->getUrl("dpdshipping/tablerate/export", $params);
         $data = [
             'label' => __('Export CSV'),
             'onclick' => "setLocation('" .
             $url .
-            "conditionName/' + $('dpdshipping_tablerate_condition_name').value + '/tablerates.csv' )",
+            "conditionName/' + $('carriers_" . $groupId . "_condition_name').value + '/tablerates.csv' )",
             'class' => '',
         ];
         $html = $buttonBlock->setData($data)->toHtml();
