@@ -202,7 +202,8 @@ class Dpdpickup extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
 			
 			$request->setPackageWeight($request->getFreeMethodWeight());
 			$request->setPackageQty($oldQty - $freeQty);
-					
+			$request->setShippingMethod('dpdpickup');
+
 			$rate = $this->getRate($request);
 
 			//print_r($rate);

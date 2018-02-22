@@ -18,7 +18,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="DPDBenelux_Shipping" setup_version="1.0.5">
+    <module name="DPDBenelux_Shipping" setup_version="1.0.6">
         <sequence>
             <module name="Magento_Backend"/>
             <module name="Magento_Quote"/>

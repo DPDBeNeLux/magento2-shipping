@@ -100,10 +100,9 @@ define([
 					var shippingAddressData = checkoutData.getShippingAddressFromData();
 
                     var parcelShopCountry = '';
-                    if(parcelShop.country == 'NL')
-                        parcelShopCountry = 'Nederland';
+                    parcelShopCountry = parcelShop.country;
 
-                    jQuery('.dpd-shipping-information').show();
+					jQuery('.dpd-shipping-information').show();
                     jQuery('#dpd_company').html('DPD Parcleshop: ' + parcelShop.company);
                     jQuery('#dpd_street').html(parcelShop.houseno);
                     jQuery('#dpd_zipcode_and_city').html(parcelShop.zipcode + ' ' + parcelShop.city);

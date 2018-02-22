@@ -47,20 +47,6 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
     </group>
-	<group id="tablerate" translate="label" type="text" sortOrder="30" showInDefault="0" showInWebsite="1" showInStore="0">
-        <label>Table rate settings</label>
-		<field id="condition_name" translate="label" type="select" sortOrder="42" showInDefault="0" showInWebsite="1" showInStore="0" canRestore="1">
-			<label>Condition</label>
-			<source_model>Magento\OfflineShipping\Model\Config\Source\Tablerate</source_model>
-		</field>
-		<field id="export" translate="label" type="DPDBenelux\Shipping\Block\Adminhtml\TablerateExport" sortOrder="43" showInDefault="0" showInWebsite="1" showInStore="0">
-			<label>Export</label>
-		</field>
-		<field id="import" translate="label" type="DPDBenelux\Shipping\Block\Adminhtml\TablerateImport" sortOrder="44" showInDefault="0" showInWebsite="1" showInStore="0">
-			<label>Import</label>
-			<backend_model>DPDBenelux\Shipping\Model\Config\Tablerate</backend_model>
-		</field>
-	</group>
 	<group id="sender_address" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
 	   showInStore="1">
 		<label>Shipping address</label>
