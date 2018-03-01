@@ -194,7 +194,7 @@ class DPDClient extends AbstractHelper
 		// Manualy get the WSDL and write it to the temp storage, the soapclient can't load it itself
 		// somehow the Bootstrap::initErrorHandler breaks it
 		$md5Key = md5($url);
-		$tempFile = $tmpDirectory . PATH_SEPARATOR . $md5Key . '.wsdl';
+		$tempFile = $tmpDirectory . DIRECTORY_SEPARATOR . $md5Key . '.wsdl';
 
 		if(!file_exists($tempFile))
 		{
