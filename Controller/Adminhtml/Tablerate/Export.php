@@ -72,7 +72,7 @@ class Export  extends \Magento\Config\Controller\Adminhtml\System\AbstractConfig
         if ($this->getRequest()->getParam('conditionName')) {
             $conditionName = $this->getRequest()->getParam('conditionName');
         } else {
-            $conditionName = $website->getConfig('carriers/tablerate/condition_name');
+            $conditionName = $website->getConfig('carriers/'.$shippingMethod.'/condition_name');
         }
         $gridBlock->setWebsiteId($website->getId())->setConditionName($conditionName)->setShippingMethod($shippingMethod);
         $content = $gridBlock->getCsvFile();
