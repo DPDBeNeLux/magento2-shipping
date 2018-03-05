@@ -222,7 +222,7 @@ class DpdSaturday extends \Magento\Shipping\Model\Carrier\AbstractCarrier implem
 				$request->setPackageValue($oldValue - $freePackageValue);
 			}
 
-			$conditionName = $this->_scopeConfig->getValue('dpdshipping/tablerate/condition_name', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
+			$conditionName = $this->_scopeConfig->getValue('carriers/dpdsaturday/condition_name', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
 			$request->setConditionName($conditionName ? $conditionName : $this->_defaultConditionName);
 
 			// Package weight and qty free shipping

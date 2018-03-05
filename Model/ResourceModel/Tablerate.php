@@ -272,9 +272,12 @@ class Tablerate  extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 			if($filePath == '')
 				continue;
 
-			$websiteId = $this->storeManager->getWebsite($object->getScopeId())->getId();
-			$conditionName = $this->getConditionName($object);
 			$shippingMethod = $key;
+			$websiteId = $this->storeManager->getWebsite($object->getScopeId())->getId();
+			$conditionName = $this->coreConfig->getValue('carriers/'.$shippingMethod.'/condition_name',
+				\Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
+				$websiteId);
+
 
 			$file = $this->getCsvFile($filePath);
 
@@ -326,22 +329,6 @@ class Tablerate  extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 			}
 		}
     }
-
-
-	/**
-	 * @param \Magento\Framework\DataObject $object
-	 * @return mixed|string
-	 * @since 100.1.0
-	 */
-	public function getConditionName(\Magento\Framework\DataObject $object)
-	{
-		if ($object->getData('groups/tablerate/fields/condition_name/inherit') == '1') {
-			$conditionName = (string)$this->coreConfig->getValue('carriers/tablerate/condition_name', 'default');
-		} else {
-			$conditionName = $object->getData('groups/tablerate/fields/condition_name/value');
-		}
-		return $conditionName;
-	}
 
 	/**
 	 * @param string $filePath
