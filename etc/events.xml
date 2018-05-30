@@ -18,7 +18,10 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="checkout_submit_all_after">
-        <observer name="dpdbenelux_shipping_quote_to_order" instance="DPDBenelux\Shipping\Observer\Observer" />
+    <event name="sales_order_save_before">
+        <observer name="dpdbenelux_shipping_sales_order_save_before" instance="DPDBenelux\Shipping\Observer\SalesOrderSaveBefore" />
+    </event>
+    <event name="sales_order_address_save_before">
+        <observer name="dpdbenelux_shipping_sales_order_address_save_before" instance="DPDBenelux\Shipping\Observer\SalesOrderAddressSaveBefore" />
     </event>
 </config>

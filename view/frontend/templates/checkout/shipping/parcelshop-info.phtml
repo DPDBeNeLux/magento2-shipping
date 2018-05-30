@@ -44,8 +44,6 @@ $dpdExtraInfoDecoded = json_decode($parcelshop['extra_info']);
 						<div class="dpd-shop-openinghours-table">
 							<?php echo $this->getOpeningHoursHtml($dpdExtraInfo) ?>
 						</div>
-					<?php else: ?>
-						<div class="std"><?php echo $dpdExtraInfo ?></div>
 					<?php endif; ?>
 				<?php endforeach ?>
 			<?php endif; ?>

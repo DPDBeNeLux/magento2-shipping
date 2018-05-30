@@ -139,7 +139,7 @@ class Index extends \Magento\Framework\App\Action\Action
 				'Opening hours' => (isset($shop->openingHours) && $shop->openingHours != "" ? json_encode($shop->openingHours) : ''),
 				'Telephone' => (isset($shop->phone) && $shop->phone != "" ? $shop->phone : ''),
 				'Website' => (isset($shop->homepage) && $shop->homepage != "" ? '<a href="' . 'http://' . $shop->homepage . '" target="_blank">' . $shop->homepage . '</a>' : ''),
-				'Extra info' => (isset($shop->extraInfo) && $shop->extraInfo != "" ? $shop->extraInfo : ''))));
+				)));
 
 			$parcelShop['gmapsMarkerContent'] = $this->_getMarkerHtml($shop, false);
 

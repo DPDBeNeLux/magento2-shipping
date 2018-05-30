@@ -63,6 +63,37 @@ class DPDPredictService extends AbstractHelper
 		$orderWeight = $this->getOrderWeight($order);
 		$predictEmail = $this->getPredictEmail($order);
 
+		// Fallback option for 1.0.6 to 1.0.7 change
+		$parcelShopId = $order->getDpdParcelshopId();
+		if($parcelShopId == '')
+			$parcelShopId = $order->getDpdShopId();
+
+
+        if ($order->getShippingMethod() == 'dpdpickup_dpdpickup')
+        {
+            $productAndServiceData = array(
+                'orderType' => 'consignment',
+                'parcelShopDelivery' => array(
+                    'parcelShopId' => $parcelShopId,
+                    'parcelShopNotification' => array(
+                        'channel' => 1, //email
+                        'value' => $predictEmail,
+                    )
+                ));
+        } else {
+            $productAndServiceData = array(
+                'orderType' => 'consignment',
+                'predict' => array(
+                    'channel' => 1, //email
+                    'value' => $predictEmail,
+                ));
+        }
+
+        if($isDpdSaturday)
+		{
+			$productAndServiceData['saturdayDelivery'] = $isDpdSaturday;
+		}
+
 		$shipmentData = [
 			'printOptions' => [
 				'printerLanguage' => 'PDF',
@@ -77,18 +108,11 @@ class DPDPredictService extends AbstractHelper
 				],
 				'parcels' => [
 					'customerReferenceNumber1' => $order->getIncrementId(),
-					'customerReferenceNumber2' => $order->getDpdShopId(),
+					'customerReferenceNumber2' => $parcelShopId,
 					'weight' => $orderWeight,
 					'returns' => $isReturn,
 				],
-				'productAndServiceData' => [
-					'orderType' => 'consignment',
-					'saturdayDelivery' => $isDpdSaturday,
-					'predict' => [
-						'channel' => 1,
-						'value' => $predictEmail,
-					]
-				]
+				'productAndServiceData' => $productAndServiceData
 			],
 		];
 
@@ -120,20 +144,40 @@ class DPDPredictService extends AbstractHelper
 
 	public function getReceiverData(\Magento\Sales\Model\Order $order)
 	{
-		$shippingAddress = $order->getShippingAddress();
+		if($order->getShippingMethod() == 'dpdpickup_dpdpickup')
+		{
+			$billingAddress = $order->getBillingAddress();
 
-		$street = $shippingAddress->getStreet();
-		$fullStreet = implode(' ', $street);
+			$street = $billingAddress->getStreet();
+			$fullStreet = implode(' ', $street);
 
-		$recipient = array(
-			'name1'             => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
-			'name2'      => $shippingAddress->getCompany(),
-			'street'           => $fullStreet,
-			'houseNo'          => '',
-			'zipCode'          => strtoupper(str_replace(' ', '', $shippingAddress->getPostcode())),
-			'city'             => $shippingAddress->getCity(),
-			'country'      => $shippingAddress->getCountryId(),
-		);
+			$recipient = array(
+				'name1'             => $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(),
+				'name2'      => $billingAddress->getCompany(),
+				'street'           => $fullStreet,
+				'houseNo'          => '',
+				'zipCode'          => strtoupper(str_replace(' ', '', $billingAddress->getPostcode())),
+				'city'             => $billingAddress->getCity(),
+				'country'      => $billingAddress->getCountryId(),
+			);
+		}
+		else
+		{
+			$shippingAddress = $order->getShippingAddress();
+
+			$street = $shippingAddress->getStreet();
+			$fullStreet = implode(' ', $street);
+
+			$recipient = array(
+				'name1'             => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
+				'name2'      => $shippingAddress->getCompany(),
+				'street'           => $fullStreet,
+				'houseNo'          => '',
+				'zipCode'          => strtoupper(str_replace(' ', '', $shippingAddress->getPostcode())),
+				'city'             => $shippingAddress->getCity(),
+				'country'      => $shippingAddress->getCountryId(),
+			);
+		}
 
 		return $recipient;
 	}

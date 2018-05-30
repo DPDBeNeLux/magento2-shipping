@@ -28,18 +28,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
 {
 	private $scopeConfig;
 	private $configWriter;
-	
+
 	public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
 								WriterInterface $configWriter)
 	{
 		$this->scopeConfig = $scopeConfig;
 		$this->configWriter = $configWriter;
 	}
-	
+
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
- 
+
         //handle all possible upgrade versions
  
         if(!$context->getVersion()) {
@@ -312,7 +312,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 				\Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
 			);
 		}
-		
+
         $setup->endSetup();
     }
 }
