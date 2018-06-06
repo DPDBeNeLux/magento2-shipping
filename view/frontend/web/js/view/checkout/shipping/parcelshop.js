@@ -83,10 +83,10 @@ define([
 					var shippingAddressData = checkoutData.getShippingAddressFromData();
 
 					window.dpdShippingAddress = parcelShop;
-					
+
 					var newShippingAddress = {
-									firstName:"DPD Parcelshop: ", 
-									lastName: parcelShop.company, 
+									firstName:"DPD Parcelshop: ",
+									lastName: parcelShop.company,
 									street: {0:parcelShop.houseno, 1:""},
 									postcode: parcelShop.zipcode,
 									city: parcelShop.city,
@@ -131,8 +131,14 @@ define([
 				function getParcels(e)
 				{
 					e.preventDefault();
+					var shippingAddressData = checkoutData.getShippingAddressFromData();
 
-					var shippingAddress = quote.shippingAddress();
+					var data = {};
+					if(shippingAddressData !== null) {
+                        data['postcode'] = shippingAddressData.postcode;
+                        data['countryId'] = shippingAddressData.country_id;
+                        data['street'] = shippingAddressData.street[0];
+                    }
 
 					$('#get_parcels_link').hide();
 
@@ -140,11 +146,7 @@ define([
 						method: 'POST',
 						showLoader: true, // enable loader
 						url : window.checkoutConfig.dpd_parcelshop_url,
-						data : {
-							postcode: shippingAddress.postcode,
-							countryId: shippingAddress.countryId,
-							street:	shippingAddress.street
-						}
+						data : data
 					}).done(function (response) {
 						var map_canvas = $('#map_canvas');
 
