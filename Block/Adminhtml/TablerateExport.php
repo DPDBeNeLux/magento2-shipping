@@ -55,8 +55,9 @@ class TablerateExport extends \Magento\Framework\Data\Form\Element\AbstractEleme
 		// get the group name
 		$groupId = $this->getContainer()['group']['id'];
 
-        $params = ['website' => $buttonBlock->getRequest()->getParam('website')];
-        $params = ['shipping_method' => $groupId];
+        $params = [];
+        $params['website'] = $buttonBlock->getRequest()->getParam('website');
+        $params['shipping_method'] = $groupId;
         $url = $this->_backendUrl->getUrl("dpdshipping/tablerate/export", $params);
         $data = [
             'label' => __('Export CSV'),
