@@ -131,13 +131,24 @@ define([
 				function getParcels(e)
 				{
 					e.preventDefault();
-					var shippingAddressData = checkoutData.getShippingAddressFromData();
+                    var shippingAddressData = quote.shippingAddress();
 					var data = {};
-					if(shippingAddressData !== null && quote.shippingAddress() !== null) {
-                        data['postcode'] = shippingAddressData.postcode !== "" ? shippingAddressData.postcode : quote.shippingAddress().postcode;
-                        data['countryId'] = shippingAddressData.country_id !== "" ? shippingAddressData.country_id : quote.shippingAddress().country_id;
-                        data['street'] = shippingAddressData.street[0] !== "" ? shippingAddressData.street[0] : quote.shippingAddress().street[0];
-                    }
+
+					//Because magnto is not consistent in its use of variables, we'll have to define the countryId.
+					var countryId;
+					if(shippingAddressData === null) {
+                        shippingAddressData = checkoutData.getShippingAddressFromData();
+                        countryId = shippingAddressData.country_id;
+                    } else {
+						countryId = shippingAddressData.countryId;
+					}
+
+					data['postcode'] =  shippingAddressData.postcode;
+					data['countryId'] = countryId;
+					if(shippingAddressData.street !== null) {
+						data['street'] =  shippingAddressData.street[0];
+					}
+
 
 					$('#get_parcels_link').hide();
 
