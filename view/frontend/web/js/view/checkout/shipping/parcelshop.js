@@ -132,12 +132,11 @@ define([
 				{
 					e.preventDefault();
 					var shippingAddressData = checkoutData.getShippingAddressFromData();
-
 					var data = {};
-					if(shippingAddressData !== null) {
-                        data['postcode'] = shippingAddressData.postcode;
-                        data['countryId'] = shippingAddressData.country_id;
-                        data['street'] = shippingAddressData.street[0];
+					if(shippingAddressData !== null && quote.shippingAddress() !== null) {
+                        data['postcode'] = shippingAddressData.postcode !== "" ? shippingAddressData.postcode : quote.shippingAddress().postcode;
+                        data['countryId'] = shippingAddressData.country_id !== "" ? shippingAddressData.country_id : quote.shippingAddress().country_id;
+                        data['street'] = shippingAddressData.street[0] !== "" ? shippingAddressData.street[0] : quote.shippingAddress().street[0];
                     }
 
 					$('#get_parcels_link').hide();
