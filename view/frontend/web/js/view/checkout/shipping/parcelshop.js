@@ -131,24 +131,27 @@ define([
 				function getParcels(e)
 				{
 					e.preventDefault();
-                    var shippingAddressData = quote.shippingAddress();
+					var shippingAddressData = quote.shippingAddress();
 					var data = {};
 
-					//Because magnto is not consistent in its use of variables, we'll have to define the countryId.
+					//Because magento is not consistent in its use of variables, we'll have to define the countryId.
 					var countryId;
-					if(shippingAddressData === null) {
-                        shippingAddressData = checkoutData.getShippingAddressFromData();
-                        countryId = shippingAddressData.country_id;
-                    } else {
-						countryId = shippingAddressData.countryId;
+					if(shippingAddressData !== null) {
+						//we use the postcode to check whether these fields are filled in, if not use the checkoutData
+						 if(typeof shippingAddressData.postcode === 'undefined') {
+								shippingAddressData = checkoutData.getShippingAddressFromData();
+								countryId = shippingAddressData.country_id;
+						 }
+						 else {
+							countryId = shippingAddressData.countryId;
+						}
 					}
 
 					data['postcode'] =  shippingAddressData.postcode;
 					data['countryId'] = countryId;
-					if(shippingAddressData.street !== null) {
+					if(shippingAddressData.street !== null && typeof shippingAddressData.street !== 'undefined') {
 						data['street'] =  shippingAddressData.street[0];
 					}
-
 
 					$('#get_parcels_link').hide();
 
@@ -207,7 +210,6 @@ define([
 							map_canvas.html(response.error_message);
 						}
 					});
-
 				};
 			});
 
