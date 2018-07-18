@@ -64,8 +64,8 @@ class Index extends \Magento\Framework\App\Action\Action
 			//{
 				//$addressToInsert .= $str . " ";
 			//}
-			$addressToInsert .= $postcode . " " . $countryId;
-			$url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' . $apiKey . '&address=' . urlencode($addressToInsert) . '&sensor=false';
+			$addressToInsert = 'country:' . $countryId . '|postal_code:' . $postcode;
+			$url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' . $apiKey . '&components=' . urlencode($addressToInsert) . '&sensor=false';
 			$source = file_get_contents($url);
 			$obj = json_decode($source);
 			$LATITUDE = $obj->results[0]->geometry->location->lat;
