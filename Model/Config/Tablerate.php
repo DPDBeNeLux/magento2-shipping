@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 namespace DPDBenelux\Shipping\Model\Config;
 
 use Magento\Framework\Model\AbstractModel;
+
 /**
  * Backend model for shipping table rates CSV importing
  *
@@ -59,10 +60,11 @@ class Tablerate extends \Magento\Framework\App\Config\Value
      */
     public function afterSave()
     {
-    	if($this->_registry->registry('dpd_import_processed'))
-			return parent::afterSave();
+        if ($this->_registry->registry('dpd_import_processed')) {
+            return parent::afterSave();
+        }
 
-    	$this->_registry->register('dpd_import_processed', true);
+        $this->_registry->register('dpd_import_processed', true);
         /** @var \DPDBenelux\Shipping\Model\ResourceModel\Tablerate $tableRate */
         $tableRate = $this->_tablerateFactory->create();
         $tableRate->uploadAndImport($this);

@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class DaysInWeek implements ArrayInterface
             array(
                 'value' => '1',
                 'label' => __('Monday'),
-			),
+            ),
             array(
                 'value' => '2',
                 'label' => __('Tuesday'),

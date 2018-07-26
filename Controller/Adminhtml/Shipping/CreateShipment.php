@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,108 +30,101 @@ use Magento\Backend\App\Action\Context;
 use Magento\Ui\Component\MassAction\Filter;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Shipment\CollectionFactory;
+use DPDBenelux\Shipping\Model\ShipmentLabelsFactory;
 
 class CreateShipment extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAction
 {
-	/**
-	 * @var \Magento\Ui\Component\MassAction\Filter
-	 */
-	protected $filter;
+    /**
+     * @var \Magento\Ui\Component\MassAction\Filter
+     */
+    protected $filter;
 
-	/**
-	 * @var object
-	 */
-	protected $collectionFactory;
+    /**
+     * @var object
+     */
+    protected $collectionFactory;
 
-	/**
-	 * @var \DPDBenelux\Shipping\Helper\Data
-	 */
-	protected $dataHelper;
+    /**
+     * @var \DPDBenelux\Shipping\Helper\Data
+     */
+    protected $dataHelper;
 
-	/**
-	 * @var FileFactory
-	 */
-	protected $fileFactory;
+    /**
+     * @var FileFactory
+     */
+    protected $fileFactory;
 
-	/**
-	 * @param Context $context
-	 * @param Filter $filter
-	 */
-	public function __construct(Context $context,
-								Filter $filter,
-								CollectioNFactory $collectionFactory,
-								\DPDBenelux\Shipping\Helper\Data $dataHelper,
-								FileFactory $fileFactory)
-	{
-		$this->filter = $filter;
-		$this->dataHelper = $dataHelper;
-		$this->fileFactory = $fileFactory;
-		$this->collectionFactory = $collectionFactory;
-		parent::__construct($context, $filter);
-	}
+    /**
+     * @param Context $context
+     * @param Filter $filter
+     * @param CollectionFactory $collectionFactory
+     * @param \DPDBenelux\Shipping\Helper\Data $dataHelper
+     * @param FileFactory $fileFactory
+     */
+    public function __construct(
+        Context $context,
+        Filter $filter,
+        CollectioNFactory $collectionFactory,
+        \DPDBenelux\Shipping\Helper\Data $dataHelper,
+        FileFactory $fileFactory
+    ) {
+        $this->filter = $filter;
+        $this->dataHelper = $dataHelper;
+        $this->fileFactory = $fileFactory;
+        $this->collectionFactory = $collectionFactory;
+        parent::__construct($context, $filter);
+    }
 
-	public function massAction(AbstractCollection $collection)
-	{
-		try
-		{
-			$labelPDFs = array();
+    public function massAction(AbstractCollection $collection)
+    {
+        try {
+            $labelPDFs = array();
 
-			if ($collection->getSize())
-			{
-				/** @var \Magento\Sales\Model\Order\Shipment $shipment */
-				foreach ($collection as $shipment)
-				{
-					$order = $shipment->getOrder();
-					if($this->dataHelper->isDPDPredictOrder($order))
-					{
-						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false, $shipment));
-					}
-					if($this->dataHelper->isDPDPickupOrder($order))
-					{
-						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false, $shipment));
-					}
-					if($this->dataHelper->isDPDSaturdayOrder($order))
-					{
-						$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, true, $shipment));
-					}
-				}
-			}
+            if ($collection->getSize()) {
+                /** @var \Magento\Sales\Model\Order\Shipment $shipment */
+                foreach ($collection as $shipment) {
+                    $order = $shipment->getOrder();
+                    if ($this->dataHelper->isDPDOrder($order)) {
+                        $label = $this->dataHelper->createShipment($order, $shipment);
 
-			if(count($labelPDFs) == 0)
-			{
-				$this->messageManager->addErrorMessage(
-					__('DPD - There are no shipping labels generated.')
-				);
+                        $labelPDFs = array_merge($labelPDFs, $label);
+                    }
+                }
+            }
 
-				return $this->_redirect($this->_redirect->getRefererUrl());
-			}
+            if (count($labelPDFs) == 0) {
+                $this->messageManager->addErrorMessage(
+                    __('DPD - There are no shipping labels generated.')
+                );
 
-			$resultPDF = $this->dataHelper->combinePDFFiles($labelPDFs);
+                return $this->_redirect($this->_redirect->getRefererUrl());
+            }
 
-			return $this->fileFactory->create(
-				'DPD-shippinglabels.pdf',
-				$resultPDF,
-				DirectoryList::VAR_DIR,
-				'application/pdf'
-			);
+            $resultPDF = $this->dataHelper->combinePDFFiles($labelPDFs);
 
-		} catch (\Exception $e) {
-			$this->messageManager->addErrorMessage($e->getMessage());
-			return $this->_redirect($this->_redirect->getRefererUrl());
-		}
-	}
+            return $this->fileFactory->create(
+                'DPD-shippinglabels.pdf',
+                $resultPDF,
+                DirectoryList::VAR_DIR,
+                'application/pdf'
+            );
+        } catch (\Exception $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
+            return $this->_redirect($this->_redirect->getRefererUrl());
+        }
+    }
 
-	/**
-	 * @return \Magento\Framework\Controller\Result\Redirect
-	 */
-	private function redirect()
-	{
-		$redirectPath = 'sales/order/index';
+    /**
+     * @return \Magento\Framework\Controller\Result\Redirect
+     */
+    private function redirect()
+    {
+        $redirectPath = 'sales/order/index';
 
-		$resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect = $this->resultRedirectFactory->create();
 
-		$resultRedirect->setPath($redirectPath);
+        $resultRedirect->setPath($redirectPath);
 
-		return $resultRedirect;
-	}
+        return $resultRedirect;
+    }
 }

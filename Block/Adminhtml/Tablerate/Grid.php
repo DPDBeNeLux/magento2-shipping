@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     protected $_conditionName;
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
     protected $_shippingMethod;
 
     /**
@@ -134,21 +134,21 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
         return $this->_conditionName;
     }
 
-	/**
-	 * @param $shippingMethod
-	 */
+    /**
+     * @param $shippingMethod
+     */
     public function setShippingMethod($shippingMethod)
-	{
-		$this->_shippingMethod = $shippingMethod;
-	}
+    {
+        $this->_shippingMethod = $shippingMethod;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getShippingMethod()
-	{
-		return $this->_shippingMethod;
-	}
+    /**
+     * @return mixed
+     */
+    public function getShippingMethod()
+    {
+        return $this->_shippingMethod;
+    }
 
     /**
      * Prepare shipping table rate collection
@@ -160,7 +160,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
         /** @var $collection \DPDBenelux\Shipping\Model\ResourceModel\Tablerate\Collection */
         $collection = $this->_collectionFactory->create();
         $collection->setConditionFilter($this->getConditionName())->setWebsiteFilter($this->getWebsiteId())
-			->addFieldToFilter('shipping_method', $this->getShippingMethod());
+            ->addFieldToFilter('shipping_method', $this->getShippingMethod());
 
         $this->setCollection($collection);
 
@@ -174,7 +174,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     protected function _prepareColumns()
     {
-		$this->addColumn(
+        $this->addColumn(
             'dest_country',
             ['header' => __('Country'), 'index' => 'dest_country', 'default' => '*']
         );

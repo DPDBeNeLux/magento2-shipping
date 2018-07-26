@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,142 +26,134 @@ use Magento\Framework\View\Asset\Repository;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
-	private $data;
+    private $data;
 
-	private $DPDPickupService;
+    private $DPDPickupService;
 
-	/**
-	 * @var \Magento\Framework\Controller\Result\JsonFactory
-	 */
-	protected $resultJsonFactory;
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
+    protected $resultJsonFactory;
 
-	private $assetRepo;
+    private $assetRepo;
 
-	public function __construct(
-		\Magento\Framework\App\Action\Context $context,
-		Data $data,
-		\Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-		DPDPickupService $DPDPickupService,
-		Repository $assetRepo
-	)
-	{
-		parent::__construct($context);
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        Data $data,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        DPDPickupService $DPDPickupService,
+        Repository $assetRepo
+    ) {
+        parent::__construct($context);
 
-		$this->data = $data;
-		$this->resultJsonFactory = $resultJsonFactory;
-		$this->DPDPickupService = $DPDPickupService;
-		$this->assetRepo = $assetRepo;
-	}
+        $this->data = $data;
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->DPDPickupService = $DPDPickupService;
+        $this->assetRepo = $assetRepo;
+    }
 
 
-	public function getGoogleMapsCenter($postcode, $countryId)
-	{
-		try
-		{
-			$apiKey = $this->data->getGoogleMapsApiKey();
-			$addressToInsert = '';
-			//foreach ($street as $str)
-			//{
-				//$addressToInsert .= $str . " ";
-			//}
-			$addressToInsert = 'country:' . $countryId . '|postal_code:' . $postcode;
-			$url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' . $apiKey . '&components=' . urlencode($addressToInsert) . '&sensor=false';
-			$source = file_get_contents($url);
-			$obj = json_decode($source);
-			$LATITUDE = $obj->results[0]->geometry->location->lat;
-			$LONGITUDE = $obj->results[0]->geometry->location->lng;
-			
-		}
-		catch(\Exception $ex)
-		{
-			echo $ex->getMessage();
-			return null;
-		}
-		return [$LATITUDE, $LONGITUDE];
-	}
+    public function getGoogleMapsCenter($postcode, $countryId)
+    {
+        try {
+            $apiKey = $this->data->getGoogleMapsApiKey();
+            $addressToInsert = '';
+            //foreach ($street as $str)
+            //{
+                //$addressToInsert .= $str . " ";
+            //}
+            $addressToInsert = 'country:' . $countryId . '|postal_code:' . $postcode;
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' . $apiKey . '&components=' . urlencode($addressToInsert) . '&sensor=false';
+            $source = file_get_contents($url);
+            $obj = json_decode($source);
+            $LATITUDE = $obj->results[0]->geometry->location->lat;
+            $LONGITUDE = $obj->results[0]->geometry->location->lng;
+        } catch (\Exception $ex) {
+            echo $ex->getMessage();
+            return null;
+        }
+        return [$LATITUDE, $LONGITUDE];
+    }
 
-	/**
-	 * Execute view action
-	 *
-	 * @return \Magento\Framework\Controller\ResultInterface
-	 */
-	public function execute()
-	{
-		//$this->_view->loadLayout();
-		//$this->_view->renderLayout();
+    /**
+     * Execute view action
+     *
+     * @return \Magento\Framework\Controller\ResultInterface
+     */
+    public function execute()
+    {
+        //$this->_view->loadLayout();
+        //$this->_view->renderLayout();
 
-		/** @var \Magento\Framework\Controller\Result\Json $result */
-		$result = $this->resultJsonFactory->create();
-		$resultData = array();
+        /** @var \Magento\Framework\Controller\Result\Json $result */
+        $result = $this->resultJsonFactory->create();
+        $resultData = array();
 
-		$post = $this->getRequest()->getPostValue();
+        $post = $this->getRequest()->getPostValue();
 
-		if(!isset($post['postcode']) || !isset($post['countryId']))
-		{
-			$resultData['success'] = false;
-			$resultData['error_message'] = __('No address found');
-			return $result->setData($resultData);
-		}
+        if (!isset($post['postcode']) || !isset($post['countryId'])) {
+            $resultData['success'] = false;
+            $resultData['error_message'] = __('No address found');
+            return $result->setData($resultData);
+        }
 
-		$coordinates = $this->getGoogleMapsCenter($post['postcode'], $post['countryId']);
-		if($coordinates == null)
-		{
-			$resultData['success'] = false;
-			$resultData['error_message'] = __('No address found');
-			return $result->setData($resultData);
-		}
+        $coordinates = $this->getGoogleMapsCenter($post['postcode'], $post['countryId']);
+        if ($coordinates == null) {
+            $resultData['success'] = false;
+            $resultData['error_message'] = __('No address found');
+            return $result->setData($resultData);
+        }
 
-		$parcelShops = $this->DPDPickupService->getParcelShops($coordinates[0], $coordinates[1]);
+        $parcelShops = $this->DPDPickupService->getParcelShops($coordinates[0], $coordinates[1]);
 
-		$params = array('_secure' => $this->getRequest()->isSecure());
+        $params = array('_secure' => $this->getRequest()->isSecure());
 
-		$resultData['success'] = true;
-		$resultData['center_lat'] = $coordinates[0];
-		$resultData['center_long'] = $coordinates[1];
+        $resultData['success'] = true;
+        $resultData['center_lat'] = $coordinates[0];
+        $resultData['center_long'] = $coordinates[1];
 
-		$resultData["gmapsIcon"] = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_parcelshop.png', $params);
-		$resultData["gmapsIconShadow"] = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_parcelshop_shadow.png', $params);
+        $resultData["gmapsIcon"] = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_parcelshop.png', $params);
+        $resultData["gmapsIconShadow"] = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_parcelshop_shadow.png', $params);
 
-		foreach($parcelShops as $shop)
-		{
-			$parcelShop = array();
-			$parcelShop['parcelShopId'] = $shop->parcelShopId;
-			$parcelShop['company'] = trim($shop->company);
-			$parcelShop['houseno'] = $shop->street . " " . $shop->houseNo;
-			$parcelShop['zipcode'] = $shop->zipCode;
-			$parcelShop['city'] = $shop->city;
-			$parcelShop['country'] = $shop->isoAlpha2;
-			$parcelShop['gmapsCenterlat'] = $shop->latitude;
-			$parcelShop['gmapsCenterlng'] = $shop->longitude;
-			$parcelShop['special'] = false;
+        foreach ($parcelShops as $shop) {
+            $parcelShop = array();
+            $parcelShop['parcelShopId'] = $shop->parcelShopId;
+            $parcelShop['company'] = trim($shop->company);
+            $parcelShop['houseno'] = $shop->street . " " . $shop->houseNo;
+            $parcelShop['zipcode'] = $shop->zipCode;
+            $parcelShop['city'] = $shop->city;
+            $parcelShop['country'] = $shop->isoAlpha2;
+            $parcelShop['gmapsCenterlat'] = $shop->latitude;
+            $parcelShop['gmapsCenterlng'] = $shop->longitude;
+            $parcelShop['special'] = false;
 
-			$parcelShop['extra_info'] = json_encode(array_filter(array(
-				'Opening hours' => (isset($shop->openingHours) && $shop->openingHours != "" ? json_encode($shop->openingHours) : ''),
-				'Telephone' => (isset($shop->phone) && $shop->phone != "" ? $shop->phone : ''),
-				'Website' => (isset($shop->homepage) && $shop->homepage != "" ? '<a href="' . 'http://' . $shop->homepage . '" target="_blank">' . $shop->homepage . '</a>' : ''),
-				)));
+            $parcelShop['extra_info'] = json_encode(array_filter(array(
+                'Opening hours' => (isset($shop->openingHours) && $shop->openingHours != "" ? json_encode($shop->openingHours) : ''),
+                'Telephone' => (isset($shop->phone) && $shop->phone != "" ? $shop->phone : ''),
+                'Website' => (isset($shop->homepage) && $shop->homepage != "" ? '<a href="' . 'http://' . $shop->homepage . '" target="_blank">' . $shop->homepage . '</a>' : ''),
+                )));
 
-			$parcelShop['gmapsMarkerContent'] = $this->_getMarkerHtml($shop, false);
+            $parcelShop['gmapsMarkerContent'] = $this->_getMarkerHtml($shop, false);
 
-			$resultData['parcelshops'][$shop->parcelShopId] = $parcelShop;
-		}
+            $resultData['parcelshops'][$shop->parcelShopId] = $parcelShop;
+        }
 
-		return $result->setData($resultData);
-	}
+        return $result->setData($resultData);
+    }
 
-	/**
-	 * Gets html for the marker info bubbles.
-	 *
-	 * @param $shop
-	 * @param $special
-	 * @return string
-	 */
-	protected function _getMarkerHtml($shop, $special)
-	{
-		$image = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/dpd_parcelshop_logo.png', array('_secure' => $this->getRequest()->isSecure()));
-		$routeIcon = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_route.png', array('_secure' => $this->getRequest()->isSecure()));
+    /**
+     * Gets html for the marker info bubbles.
+     *
+     * @param $shop
+     * @param $special
+     * @return string
+     */
+    protected function _getMarkerHtml($shop, $special)
+    {
+        $image = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/dpd_parcelshop_logo.png', array('_secure' => $this->getRequest()->isSecure()));
+        $routeIcon = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_route.png', array('_secure' => $this->getRequest()->isSecure()));
 
-		$html = '<div class="content">
+        $html = '<div class="content">
             <table style="min-width:250px" cellpadding="3" cellspacing="3" border="0">
                 <tbody>
                     <tr>
@@ -180,35 +172,32 @@ class Index extends \Magento\Framework\App\Action\Action
             ';
 
 
-		if (!$special && isset($shop->openingHours) && $shop->openingHours != "") {
-			$html .= '<div class="dotted-line">
+        if (!$special && isset($shop->openingHours) && $shop->openingHours != "") {
+            $html .= '<div class="dotted-line">
             <table>
             <tbody>';
-			foreach ($shop->openingHours as $openinghours) {
-				$html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . $openinghours->weekday . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openMorning . ' - ' . $openinghours->closeMorning . '
+            foreach ($shop->openingHours as $openinghours) {
+                $html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . __($openinghours->weekday) . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openMorning . ' - ' . $openinghours->closeMorning . '
             </td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openAfternoon . ' - ' . $openinghours->closeAfternoon . '</td></tr>';
-			}
-			$html .= '</tbody>
+            }
+            $html .= '</tbody>
             </table>
             </div><div class="dpdclear"></div>';
-		}
-		elseif($special && $shop->getParcelshopOpeninghours() && $shop->getParcelshopOpeninghours()!=""){
-
-			$html .= '<div class="dotted-line">
+        } elseif ($special && $shop->getParcelshopOpeninghours() && $shop->getParcelshopOpeninghours()!="") {
+            $html .= '<div class="dotted-line">
             <table>
             <tbody>';
-			foreach (json_decode($shop->getParcelshopOpeninghours()) as $openinghours) {
-
-				$html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . $openinghours['weekday'] . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours['openMorning'] . ' - ' . $openinghours['closeMorning'] . '
+            foreach (json_decode($shop->getParcelshopOpeninghours()) as $openinghours) {
+                $html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . $openinghours['weekday'] . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours['openMorning'] . ' - ' . $openinghours['closeMorning'] . '
             </td><td>' . $openinghours['openAfternoon'] . ' - ' . $openinghours['closeAfternoon'] . '</td></tr>';
-			}
-			$html .= '</tbody>
+            }
+            $html .= '</tbody>
             </table>
             </div><div class="dpdclear"></div>';
-		}
+        }
 
 
-		$html .= '<div class="dotted-line">
+        $html .= '<div class="dotted-line">
                     <table>
                         <tbody>
                             <tr style="cursor: pointer;">
@@ -218,6 +207,6 @@ class Index extends \Magento\Framework\App\Action\Action
                         </tbody>
                     </table>
                   </div></div><div class="dpdclear"></div>';
-		return $html;
-	}
+        return $html;
+    }
 }

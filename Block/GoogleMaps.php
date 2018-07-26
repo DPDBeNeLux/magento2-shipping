@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@ namespace DPDBenelux\Shipping\Block;
 
 class GoogleMaps extends \Magento\Framework\View\Element\Template
 {
-	const DPD_GOOGLE_MAPS_API = 'carriers/dpdpickup/google_maps_api';
+    const DPD_GOOGLE_MAPS_API = 'carriers/dpdpickup/google_maps_api';
 
-	public function __construct(\Magento\Framework\View\Element\Template\Context $context)
-	{
-		parent::__construct($context);
-	}
+    public function __construct(\Magento\Framework\View\Element\Template\Context $context)
+    {
+        parent::__construct($context);
+    }
 
-	public function getApiKey()
-	{
-		return $this->_scopeConfig->getValue(self::DPD_GOOGLE_MAPS_API);
-	}
+    public function getApiKey()
+    {
+        return $this->_scopeConfig->getValue(self::DPD_GOOGLE_MAPS_API);
+    }
 }
