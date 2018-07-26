@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+ This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
+
+ Copyright (C) 2018  DPD Nederland B.V.
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="dpdclassic" translate="label" type="text" sortOrder="-2" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label>DPD Classic</label>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Method Name</label>
+        </field>
+		<field id="rate_type" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Rate Type</label>
+			<source_model>DPDBenelux\Shipping\Config\Source\Settings\RateType</source_model>
+		</field>
+        <field id="condition_name" translate="label" type="select" sortOrder="42" showInDefault="0" showInWebsite="1" showInStore="0" canRestore="1">
+            <label>Condition</label>
+            <source_model>Magento\OfflineShipping\Model\Config\Source\Tablerate</source_model>
+        </field>
+        <field id="export" translate="label" type="DPDBenelux\Shipping\Block\Adminhtml\TablerateExport" sortOrder="43" showInDefault="0" showInWebsite="1" showInStore="0">
+            <label>Export</label>
+        </field>
+        <field id="import" translate="label" type="DPDBenelux\Shipping\Block\Adminhtml\TablerateImport" sortOrder="44" showInDefault="0" showInWebsite="1" showInStore="0">
+            <label>Import</label>
+            <backend_model>DPDBenelux\Shipping\Model\Config\Tablerate</backend_model>
+        </field>
+        <field id="price" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Price</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+			<depends>
+				<field id="rate_type">flat</field>
+			</depends>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Sort Order</label>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Title</label>
+        </field>
+        <field id="sallowspecific" translate="label" type="select" sortOrder="900" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Ship to Applicable Countries</label>
+            <frontend_class>shipping-applicable-country</frontend_class>
+            <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
+        </field>
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="910" showInDefault="1"
+               showInWebsite="1" showInStore="0">
+            <label>Ship to Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <can_be_empty>1</can_be_empty>
+        </field>
+        <field id="showmethod" translate="label" type="select" sortOrder="920" showInDefault="1" showInWebsite="1"
+               showInStore="0">
+            <label>Show Method if Not Applicable</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="specificerrmsg" translate="label" type="textarea" sortOrder="800" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Displayed Error Message</label>
+        </field>
+    </group>
+</include>

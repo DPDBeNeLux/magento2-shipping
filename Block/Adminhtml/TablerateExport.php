@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,8 +52,8 @@ class TablerateExport extends \Magento\Framework\Data\Form\Element\AbstractEleme
             \Magento\Backend\Block\Widget\Button::class
         );
 
-		// get the group name
-		$groupId = $this->getContainer()['group']['id'];
+        // get the group name
+        $groupId = $this->getContainer()['group']['id'];
 
         $params = [];
         $params['website'] = $buttonBlock->getRequest()->getParam('website');

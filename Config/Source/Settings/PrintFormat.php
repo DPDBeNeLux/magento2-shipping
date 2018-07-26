@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,18 @@ use Magento\Framework\Option\ArrayInterface;
 
 class PrintFormat implements ArrayInterface
 {
-	/**
-	 * Return mode option array
-	 * @return array
-	 */
-	public function toOptionArray()
-	{
+    /**
+     * Return mode option array
+     * @return array
+     */
+    public function toOptionArray()
+    {
 		// @codingStandardsIgnoreStart
 		$options = [
 			['value' => 'A4', 'label' => __('A4')],
 			['value' => 'A6', 'label' => __('A6')],
 		];
 		// @codingStandardsIgnoreEnd
-		return $options;
-	}
+        return $options;
+    }
 }

@@ -16,6 +16,9 @@ After upgrade or install
 ------------------------
 
 ```bash
+php bin/magento module:enable DPDBenelux_Shipping
+```
+```bash
 php bin/magento setup:upgrade
 ```
 ```bash

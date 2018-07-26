@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,8 +39,9 @@ class SalesOrderAddressSaveBefore implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         // Ignore adminhtml
-        if($this->state->getAreaCode() == \Magento\Framework\App\Area::AREA_ADMINHTML)
+        if ($this->state->getAreaCode() == \Magento\Framework\App\Area::AREA_ADMINHTML) {
             return;
+        }
 
         $shippingAddress = $observer->getEvent()->getAddress();
         /** @var Address $shippingAddress */
@@ -48,23 +49,25 @@ class SalesOrderAddressSaveBefore implements ObserverInterface
         $order = $shippingAddress->getOrder();
         /** @var Order $order */
 
-		// Ignore all orders that aren't dpd pickup
-        if($order->getShippingMethod() != 'dpdpickup_dpdpickup')
-        	return;
+        // Ignore all orders that aren't dpd pickup
+        if ($order->getShippingMethod() != 'dpdpickup_dpdpickup') {
+            return;
+        }
 
-		// If the address isn't the shipping address
-        if($shippingAddress->getAddressType() != 'shipping')
-        	return;
+        // If the address isn't the shipping address
+        if ($shippingAddress->getAddressType() != 'shipping') {
+            return;
+        }
 
-		$shippingAddress->setFirstname('DPD ParcelShop: ');
-		$shippingAddress->setLastname($order->getDpdCompany());
-		$shippingAddress->setStreet($order->getDpdStreet());
-		$shippingAddress->setCity($order->getDpdCity());
-		$shippingAddress->setPostcode($order->getDpdZipcode());
-		$shippingAddress->setCountryId($order->getDpdCountry());
+        $shippingAddress->setFirstname('DPD ParcelShop: ');
+        $shippingAddress->setLastname($order->getDpdCompany());
+        $shippingAddress->setStreet($order->getDpdStreet());
+        $shippingAddress->setCity($order->getDpdCity());
+        $shippingAddress->setPostcode($order->getDpdZipcode());
+        $shippingAddress->setCountryId($order->getDpdCountry());
 
-		// empty this otherwise you'd get customer data and DPD parcelshop data mixed up
-		$shippingAddress->setCompany('');
-		$shippingAddress->setTelephone('');
+        // empty this otherwise you'd get customer data and DPD parcelshop data mixed up
+        $shippingAddress->setCompany('');
+        $shippingAddress->setTelephone('');
     }
 }
