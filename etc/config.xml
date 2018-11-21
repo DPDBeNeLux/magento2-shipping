@@ -23,6 +23,7 @@
             <account_settings>
                 <print_format>A4</print_format>
                 <account_type>B2C</account_type>
+                <picqer_mode>0</picqer_mode>
             </account_settings>
         </dpdshipping>
         <carriers>
@@ -76,7 +77,7 @@
             </dpdclassic>
             <dpdpredict>
                 <active>0</active>
-				<rate_type>flat</rate_type>
+                <rate_type>flat</rate_type>
                 <sallowspecific>0</sallowspecific>
                 <model>DPDBenelux\Shipping\Model\Carrier\Dpdpredict</model>
                 <name>DPD Predict</name>
@@ -88,7 +89,7 @@
             </dpdpredict>
             <dpdsaturday>
                 <active>0</active>
-				<rate_type>flat</rate_type>
+                <rate_type>flat</rate_type>
                 <sallowspecific>0</sallowspecific>
                 <model>DPDBenelux\Shipping\Model\Carrier\DpdSaturday</model>
                 <name>DPD Saturday</name>
@@ -100,7 +101,7 @@
             </dpdsaturday>
             <dpdclassicsaturday>
                 <active>0</active>
-				<rate_type>flat</rate_type>
+                <rate_type>flat</rate_type>
                 <sallowspecific>0</sallowspecific>
                 <model>DPDBenelux\Shipping\Model\Carrier\DpdClassicSaturday</model>
                 <name>DPD Classic Saturday</name>
@@ -112,7 +113,7 @@
             </dpdclassicsaturday>
             <dpdpickup>
                 <active>0</active>
-				<rate_type>flat</rate_type>
+                <rate_type>flat</rate_type>
                 <sallowspecific>0</sallowspecific>
                 <model>DPDBenelux\Shipping\Model\Carrier\Dpdpickup</model>
                 <name>DPD Pickup</name>

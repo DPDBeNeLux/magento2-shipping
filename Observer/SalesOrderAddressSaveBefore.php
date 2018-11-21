@@ -31,9 +31,18 @@ class SalesOrderAddressSaveBefore implements ObserverInterface
      */
     private $state;
 
-    public function __construct(\Magento\Framework\App\State $state)
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    public function __construct(
+        \Magento\Framework\App\State $state,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+    )
     {
         $this->state = $state;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -59,15 +68,22 @@ class SalesOrderAddressSaveBefore implements ObserverInterface
             return;
         }
 
-        $shippingAddress->setFirstname('DPD ParcelShop: ');
+
+        $shippingAddress->setFirstname('DPD ParcelShop:');
         $shippingAddress->setLastname($order->getDpdCompany());
         $shippingAddress->setStreet($order->getDpdStreet());
         $shippingAddress->setCity($order->getDpdCity());
         $shippingAddress->setPostcode($order->getDpdZipcode());
         $shippingAddress->setCountryId($order->getDpdCountry());
+        $shippingAddress->setCompany('');
+
+        if($this->scopeConfig->getValue('dpdshipping/account_settings/picqer_mode')) {
+            $shippingAddress->setFirstname($order->getBillingAddress()->getFirstname());
+            $shippingAddress->setLastname($order->getBillingAddress()->getLastname());
+            $shippingAddress->setCompany('DPD ParcelShop: ' . $order->getDpdCompany());
+        }
 
         // empty this otherwise you'd get customer data and DPD parcelshop data mixed up
-        $shippingAddress->setCompany('');
         $shippingAddress->setTelephone('');
     }
 }
