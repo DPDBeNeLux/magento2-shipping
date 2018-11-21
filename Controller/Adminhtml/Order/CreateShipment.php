@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,119 +29,122 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollection
 use Magento\Backend\App\Action\Context;
 use Magento\Ui\Component\MassAction\Filter;
 use Magento\Sales\Model\Order;
-
+use DPDBenelux\Shipping\Model\ShipmentLabelsFactory;
 
 class CreateShipment extends \Magento\Backend\App\Action
 {
-	/**
-	 * @var \Magento\Ui\Component\MassAction\Filter
-	 */
-	protected $filter;
+    /**
+     * @var \Magento\Ui\Component\MassAction\Filter
+     */
+    protected $filter;
 
-	/**
-	 * @var object
-	 */
-	protected $collectionFactory;
+    /**
+     * @var object
+     */
+    protected $collectionFactory;
 
-	/**
-	 * @var \DPDBenelux\Shipping\Helper\Data
-	 */
-	protected $dataHelper;
+    /**
+     * @var \DPDBenelux\Shipping\Helper\Data
+     */
+    protected $dataHelper;
 
-	/**
-	 * @var FileFactory
-	 */
-	protected $fileFactory;
+    /**
+     * @var FileFactory
+     */
+    protected $fileFactory;
 
-	/**
-	 * @param Context $context
-	 * @param Filter $filter
-	 */
-	public function __construct(Context $context,
-								Filter $filter,
-								OrderCollectionFactory $collectionFactory,
-								\DPDBenelux\Shipping\Helper\Data $dataHelper,
-								FileFactory $fileFactory)
-	{
-		$this->filter = $filter;
-		$this->collectionFactory = $collectionFactory;
-		$this->dataHelper = $dataHelper;
-		$this->fileFactory = $fileFactory;
-		parent::__construct($context);
-	}
+    /**
+     * @var \DPDBenelux\Shipping\Model\ShipmentLabelsFactory
+     */
+    private $shipmentLabelsFactory;
 
-	/**
-	 * Execute action
-	 *
-	 * @return \Magento\Framework\Controller\Result\|\Magento\Framework\App\ResponseInterface
-	 * @throws \Magento\Framework\Exception\LocalizedException|\Exception
-	 */
-	public function execute()
-	{
-		try
-		{
-			$collection = $this->collectionFactory->create();
-			$collection = $this->filter->getCollection($collection);
+    /**
+     * @param Context $context
+     * @param Filter $filter
+     * @param OrderCollectionFactory $collectionFactory
+     * @param \DPDBenelux\Shipping\Helper\Data $dataHelper
+     * @param ShipmentLabelsFactory $shipmentLabelsFactory
+     * @param FileFactory $fileFactory
+     */
+    public function __construct(
+        Context $context,
+        Filter $filter,
+        OrderCollectionFactory $collectionFactory,
+        \DPDBenelux\Shipping\Helper\Data $dataHelper,
+        ShipmentLabelsFactory $shipmentLabelsFactory,
+        FileFactory $fileFactory
+    ) {
+        $this->filter = $filter;
+        $this->collectionFactory = $collectionFactory;
+        $this->dataHelper = $dataHelper;
+        $this->fileFactory = $fileFactory;
+        $this->shipmentLabelsFactory = $shipmentLabelsFactory;
+        parent::__construct($context);
+    }
 
-			$labelPDFs = array();
+    /**
+     * Execute action
+     *
+     * @return \Magento\Framework\Controller\Result\|\Magento\Framework\App\ResponseInterface
+     * @throws \Magento\Framework\Exception\LocalizedException|\Exception
+     */
+    public function execute()
+    {
+        try {
+            $collection = $this->collectionFactory->create();
+            $collection = $this->filter->getCollection($collection);
 
-			foreach ($collection as $order)
-			{
-				/** @var Order $order */
-				$this->currentOrder = $order;
+            $labelPDFs = array();
 
-				if($this->dataHelper->isDPDPredictOrder($order))
-				{
-					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false));
-				}
+            foreach ($collection as $order) {
+                if ($this->dataHelper->isDPDOrder($order)) {
+                    if ($order->getShipmentsCollection()->count() > 1) {
+                        $this->messageManager->addErrorMessage(
+                            sprintf(__('Order %s has more than 1 shipment, go the the shipment overview to generate a label.'), $order->getIncrementId())
+                        );
+                        continue;
+                    }
 
-				if($this->dataHelper->isDPDPickupOrder($order))
-				{
-					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, false));
-				}
+                    $label = $this->dataHelper->createShipment($order);
 
-				if($this->dataHelper->isDPDSaturdayOrder($order))
-				{
-					$labelPDFs = array_merge($labelPDFs, $this->dataHelper->createShipment($order, true));
-				}
-			}
+                    $labelPDFs = array_merge($labelPDFs, $label);
+                }
+            }
 
 
-			if(count($labelPDFs) == 0)
-			{
-				$this->messageManager->addErrorMessage(
-					__('DPD - There are no shipping labels generated.')
-				);
+            if (count($labelPDFs) == 0) {
+                $this->messageManager->addErrorMessage(
+                    __('DPD - There are no shipping labels generated.')
+                );
 
-				return $this->_redirect($this->_redirect->getRefererUrl());
-			}
+                return $this->_redirect($this->_redirect->getRefererUrl());
+            }
 
-			$resultPDF = $this->dataHelper->combinePDFFiles($labelPDFs);
+            $resultPDF = $this->dataHelper->combinePDFFiles($labelPDFs);
 
-			return $this->fileFactory->create(
-				'DPD-shippinglabels.pdf',
-				$resultPDF,
-				DirectoryList::VAR_DIR,
-				'application/pdf'
-			);
+            return $this->fileFactory->create(
+                'DPD-shippinglabels.pdf',
+                $resultPDF,
+                DirectoryList::VAR_DIR,
+                'application/pdf'
+            );
+        } catch (\Exception $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
+            return $this->_redirect($this->_redirect->getRefererUrl());
+        }
+    }
 
-		} catch (\Exception $e) {
-			$this->messageManager->addErrorMessage($e->getMessage());
-			return $this->_redirect($this->_redirect->getRefererUrl());
-		}
-	}
+    /**
+     * @return \Magento\Framework\Controller\Result\Redirect
+     */
+    private function redirect()
+    {
+        $redirectPath = 'sales/order/index';
 
-	/**
-	 * @return \Magento\Framework\Controller\Result\Redirect
-	 */
-	private function redirect()
-	{
-		$redirectPath = 'sales/order/index';
+        $resultRedirect = $this->resultRedirectFactory->create();
 
-		$resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect->setPath($redirectPath);
 
-		$resultRedirect->setPath($redirectPath);
-
-		return $resultRedirect;
-	}
+        return $resultRedirect;
+    }
 }

@@ -1,7 +1,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,9 @@ define([
 
             this.address =  ko.observable(null);
 
-            if(typeof window.dpdShippingAddress === undefined)
+            if (typeof window.dpdShippingAddress === undefined) {
                 return this;
+            }
 
 
             this.address = window.dpdShippingAddress;

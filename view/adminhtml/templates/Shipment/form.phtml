@@ -1,0 +1,55 @@
+<div id="dpd-popup-modal" style="display:none;">
+    <form method="POST" action="<?php /* @escapeNotVerified */ echo $block->getPostUrl() ?>" id="dpd-popup-form" class="admin__scope-old edit-form" target="_blank">
+        <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
+        <input type="hidden" name="current_shipment" value="<?php /* @escapeNotVerified */ echo $block->getShipmentId() ?>">
+
+        <div class="entry-edit form-inline">
+            <fieldset class="fieldset admin__fieldset" id="base_fieldset"><br>
+                <div class="admin__field field field-attribute_label  required _required" data-ui-id="form-front-options-fieldset-element-form-field-parcels">
+                    <label class="label admin__field-label" for="parcels"><span><?php echo __("Number of parcels"); ?></span></label>
+                    <div class="admin__field-control control">
+                        <input id="parcels" name="parcels" type="number" value="1" title="<?php echo __("Number of parcels"); ?>" class="input-text admin__control-text required-entry _required" aria-required="true" min="1" required>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+</div>
+
+<script>
+    require(['jquery', 'Magento_Ui/js/modal/modal'],
+        function($, modal) {
+            var options = {
+                type: 'popup',
+                responsive: true,
+                innerScroll: true,
+                title: '<?=__('DPD - Create additional label(s)')?>',
+                buttons: [{
+                    text: $.mage.__('Close'),
+                    class: '',
+                    click: function () {
+                        this.closeModal();
+                    }
+                },
+                {
+                    text: $.mage.__('Print'),
+                    class: '',
+                    click: function () {
+                        $("#dpd-popup-form").submit();
+                    }
+                }]
+            };
+
+            $(document).on('submit','form#dpd-popup-form',function(){
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            });
+
+            var popup = modal(options, $('#dpd-popup-modal'));
+            $("#dpd_generate_label").on('click',function(){
+                $("#dpd-popup-modal").modal("openModal");
+            });
+        }
+    );
+</script>

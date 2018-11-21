@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2017  DPD Nederland B.V.
+ * Copyright (C) 2018  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@ namespace DPDBenelux\Shipping\Block\Adminhtml;
 
 class TablerateImport extends \Magento\Framework\Data\Form\Element\AbstractElement
 {
-	protected $shipconfig;
+    protected $shipconfig;
 
-	/**
+    /**
      * @return void
      */
     protected function _construct()
     {
         parent::_construct();
         $this->setType('file');
-	}
+    }
     /**
      * Enter description here...
      *
@@ -39,8 +39,8 @@ class TablerateImport extends \Magento\Framework\Data\Form\Element\AbstractEleme
     public function getElementHtml()
     {
 
-    	// get the group name
-		$groupId = $this->getContainer()['group']['id'];
+        // get the group name
+        $groupId = $this->getContainer()['group']['id'];
 
         $html = '';
         $html .= '<input id="time_condition_'.$groupId.'" type="hidden" name="' . $this->getName() . '" value="' . time() . '" />';

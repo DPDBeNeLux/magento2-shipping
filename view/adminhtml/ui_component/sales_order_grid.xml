@@ -2,7 +2,7 @@
 <!--
  This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
 
- Copyright (C) 2017  DPD Nederland B.V.
+ Copyright (C) 2018  DPD Nederland B.V.
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,11 +24,37 @@
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="type" xsi:type="string">dpd_create_shipment</item>
-                        <item name="label" xsi:type="string" translate="true">DPD - Create B2C shipment(s)</item>
+                        <item name="label" xsi:type="string" translate="true">DPD - Create shipment(s)</item>
                         <item name="url" xsi:type="url" path="dpdshipping/order/createShipment"/>
                         <item name="confirm" xsi:type="array">
-                            <item name="title" xsi:type="string" translate="true">DPD - Create B2C shipment(s)</item>
+                            <item name="title" xsi:type="string" translate="true">DPD - Create shipment(s)</item>
                             <item name="message" xsi:type="string" translate="true">Are you sure you want to create shipments and download labels for the selected orders?</item>
+                        </item>
+                    </item>
+                </argument>
+            </action>
+            <action name="dpd_print_return_label">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">dpd_print_return_label</item>
+                        <item name="label" xsi:type="string" translate="true">DPD - Print return label</item>
+                        <item name="url" xsi:type="url" path="dpdshipping/order/printReturnLabel"/>
+                        <item name="confirm" xsi:type="array">
+                            <item name="title" xsi:type="string" translate="true">DPD - Print return label</item>
+                            <item name="message" xsi:type="string" translate="true">Are you sure you want to create return labels and download labels for the selected orders?</item>
+                        </item>
+                    </item>
+                </argument>
+            </action>
+            <action name="dpd_print_shipping_list">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">dpd_print_shipping_list</item>
+                        <item name="label" xsi:type="string" translate="true">DPD - Print shipping list</item>
+                        <item name="url" xsi:type="url" path="dpdshipping/order/printShippingList"/>
+                        <item name="confirm" xsi:type="array">
+                            <item name="title" xsi:type="string" translate="true">DPD - Print shipping list</item>
+                            <item name="message" xsi:type="string" translate="true">Are you sure you want to print the shipping list of all selected orders?</item>
                         </item>
                     </item>
                 </argument>

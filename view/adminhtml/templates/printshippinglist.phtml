@@ -1,0 +1,100 @@
+<html>
+<head>
+    <title>DPD Shipping List</title>
+    <style>
+        @media print {
+            @page {
+                margin: 0;
+                size: A4 landscape;
+            }
+            td {
+                font-size: 12px;
+            }
+        }
+        body {
+            margin: 1cm;
+        }
+        thead td {
+            border-bottom: 1px solid black;
+            font-weight: bold;
+        }
+        td {
+            padding-right: 15px;
+        }
+        .signature {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 50px;
+        }
+    </style>
+
+    <script>
+        window.print();
+        window.onafterprint = function() {
+            history.back(-1);
+        };
+    </script>
+</head>
+<body>
+
+<table style="width: 100%; ">
+    <tr>
+        <td style=" text-align: left; ">
+            <br /> <b><?=__('Customer address')?></b>
+            <br /> <?=$sender['name1']?>
+            <br /> <?=$sender['street']?>
+            <br /> <?=$sender['country']?>-<?=$sender['zipCode']?> <?=$sender['city']?>
+        </td>
+        <td style="text-align: left;">
+            <br /> <b><?=__('Date')?>:</b> <?=date("d-m-Y")?>
+            <br /> <b><?=__('Packages')?>:</b> <?=count($orders['list'])?>
+        </td>
+        <td style=" text-align: right; ">
+            <img src="<?=$block->getViewFileUrl('DPDBenelux_Shipping::images/dpd.png')?>" style="width:50px; height:50px;" />
+        </td>
+
+    </tr>
+</table>
+
+
+<table style="width: 100%; ">
+    <thead>
+    <tr>
+        <td><?=__('Nr.')?></td>
+        <td><?=__('Package Nr.')?></td>
+        <td><?=__('Shipment type')?></td>
+        <td><?=__('Company and name')?></td>
+        <td><?=__('Address')?></td>
+        <td><?=__('Zipcode')?></td>
+        <td><?=__('City')?></td>
+        <td><?=__('Reference #1')?></td>
+        <td><?=__('Reference #2')?></td>
+        <td><?=__('Weight')?></td>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach($orders["list"] as $order) { ?>
+        <tr>
+            <td> <?=$order['count']?> </td>
+            <td> <?=$order["parcelLabelNumber"]?> </td>
+            <td> <?=$order["carrierName"]?> </td>
+            <td> <?=$order["customerName"]?> </td>
+            <td> <?=$order["address"]?> </td>
+            <td> <?=$order["zipCode"]?> </td>
+            <td> <?=$order["city"]?> </td>
+            <td> <?=$order["referenceNumber"]?> </td>
+            <td> <?=$order["referenceNumber2"]?> </td>
+            <td> <?=$order["weight"]?> </td>
+        </tr>
+    <?php } ?>
+    </tbody>
+</table>
+<?php
+if(count($orders['list']) == 0) {
+    echo __('No DPD shipments selected.');
+}
+?>
+
+<div class="signature"><?=__('Signature')?>   ___________________________</div>
+</body>
+</html>
