@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2018  DPD Nederland B.V.
+ * Copyright (C) 2019  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
  */
 namespace DPDBenelux\Shipping\Helper\Services;
 
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Helper\AbstractHelper;
 use DPDBenelux\Shipping\Helper\DPDClient;
 use Magento\Sales\Model\Order;
@@ -39,17 +40,33 @@ class DPDPredictService extends AbstractHelper
      */
     private $shipmentLabelsFactory;
 
+    /**
+     * @var DPDClient
+     */
     private $dpdClient;
+
+    /**
+     * @var \Magento\Framework\Filesystem\Io\File
+     */
+    private $filesystem;
+    /**
+     * @var \Magento\Framework\Filesystem\DirectoryList
+     */
+    private $directoryList;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \DPDBenelux\Shipping\Helper\Services\AuthenticationService $authenticationService,
+        \Magento\Framework\Filesystem\Io\File $filesystem,
         DPDClient $DPDClient,
+        \Magento\Framework\Filesystem\DirectoryList $directoryList,
         ShipmentLabelsFactory $shipmentLabelsFactory
     ) {
         $this->authenticationService = $authenticationService;
         $this->shipmentLabelsFactory = $shipmentLabelsFactory;
         $this->dpdClient = $DPDClient;
+        $this->filesystem = $filesystem;
+        $this->directoryList = $directoryList;
         parent::__construct($context);
     }
 
@@ -293,6 +310,17 @@ class DPDPredictService extends AbstractHelper
         }
         $labelDataSerialized = serialize($labelData);
 
+        $saveLabelAsFile = $this->scopeConfig->isSetFlag('dpdshipping/account_settings/save_label_file');
+        $labelPath = $this->scopeConfig->getValue('dpdshipping/account_settings/label_path');
+
+        if (empty($labelPath)) {
+            $labelPath = $this->directoryList->getRoot() . '/var/dpd_labels/';
+        }
+
+        $labelPath = rtrim($labelPath, '/') . '/';
+
+        $labelName = sprintf('%s-%s.pdf', $order->getIncrementId(), $result->orderResult->shipmentResponses->mpsId);
+
         // Save the label to the database
         $shipmentLabels = $this->shipmentLabelsFactory->create();
         $shipmentLabels->setLabelNumbers($labelDataSerialized);
@@ -300,9 +328,23 @@ class DPDPredictService extends AbstractHelper
         $shipmentLabels->setShipmentId($shipment->getId());
         $shipmentLabels->setShipmentIncrementId($shipment->getIncrementId());
         $shipmentLabels->setOrderId($order->getId());
-        $shipmentLabels->setLabel($result->orderResult->parcellabelsPDF);
+
+        if (!$saveLabelAsFile) {
+            $shipmentLabels->setLabel($result->orderResult->parcellabelsPDF);
+        } else {
+            $shipmentLabels->setLabelPath($labelPath . $labelName);
+        }
+
         $shipmentLabels->setIsReturn($isReturn ? "1" : "0");
         $shipmentLabels->save();
+
+        // Write file to a directory
+        if ($saveLabelAsFile) {
+            if (!file_exists($labelPath)) {
+                mkdir($labelPath, 0755, true);
+            }
+            $this->filesystem->write($labelPath . $labelName, $result->orderResult->parcellabelsPDF);
+        }
 
         return [
             'senderData' => $senderData,
