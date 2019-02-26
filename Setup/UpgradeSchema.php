@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2018  DPD Nederland B.V.
+ * Copyright (C) 2019  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -367,6 +367,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
 
+        #16402
+        if (version_compare($context->getVersion(), '1.1.1') < 0) {
+            if (!$setup->getConnection()->tableColumnExists('dpd_shipment_label', 'label_path')) {
+                $setup->getConnection()->addColumn($setup->getTable('dpd_shipment_label'), 'label_path', [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable'  => true,
+                    'length'    => 255,
+                    'after'     => 'label',
+                    'comment'   => 'Label Path'
+                ]);
+            }
+        }
         $setup->endSetup();
     }
 }

@@ -2,7 +2,7 @@
 /**
  * This file is part of the Magento 2 Shipping module of DPD Nederland B.V.
  *
- * Copyright (C) 2018  DPD Nederland B.V.
+ * Copyright (C) 2019  DPD Nederland B.V.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@ class DPDClient extends AbstractHelper
             } elseif (isset($fs->detail->authenticationFault)) {
                 throw new \Exception('[DPD-Shipment] ' . $fs->detail->authenticationFault->errorMessage);
             } else {
-                $this->_logger->info('[DPD-Shipment] OrderNumber: ' . $shipmentData['order']['parcels']['customerReferenceNumber1'] . " - Exception: " . $fs->getMessage());
+                $this->_logger->info('[DPD-Shipment] Exception: ' . $fs->getMessage());
                 throw new \Exception(__('[DPD-Shipment] Unknown error occurred'));
             }
         }
