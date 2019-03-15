@@ -16,19 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-var config = {
-    config: {
-        mixins: {
-            'Magento_Checkout/js/action/set-shipping-information': {
-                'DPDBenelux_Shipping/js/model/set-shipping-information-mixin': true
+define(
+    [
+        'jquery',
+        'mageUtils',
+        './shipping-rates-validation-rules',
+        'mage/translate'
+    ],
+    function ($, utils, validationRules, $t) {
+        "use strict";
+        return {
+            validationErrors: [],
+            validate: function(address) {
+                var self = this;
+                this.validationErrors = [];
+                $.each(validationRules.getRules(), function(field, rule) {
+                    if (rule.required && utils.isEmpty(address[field])) {
+                        var message = $t('Field ') + field + $t(' is required.');
+                        self.validationErrors.push(message);
+                    }
+                });
+                return !Boolean(this.validationErrors.length);
             }
-        }
-    },
-    map: {
-        '*': {
-            "Aheadworks_OneStepCheckout/template/shipping-method.html" :
-                "DPDBenelux_Shipping/template/checkout/onestepcheckout/shipping-method.html"
-        }
+        };
     }
-};
-
+);

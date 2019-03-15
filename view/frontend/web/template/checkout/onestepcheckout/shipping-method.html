@@ -1,0 +1,73 @@
+<!-- ko if: isShown -->
+<li class="aw-onestep-groups_item shipping-method">
+    <div class="group-title">
+        <h2><span class="mark"></span><span data-bind="i18n: 'Shipping method'"></span></h2>
+    </div>
+    <div class="group-content">
+        <div class="onestep-shipping-method" data-bind="blockLoader: isLoading">
+            <!-- ko if: rates().length  -->
+            <form class="form" novalidate="novalidate">
+                <!-- ko if: errorValidationMessage().length > 0 -->
+                <div class="message notice">
+                    <span><!-- ko text: errorValidationMessage()--><!-- /ko --></span>
+                </div>
+                <!-- /ko -->
+                <div id="checkout-shipping-method-load">
+                    <div class="onestep-shipping-method-list">
+                    <!--ko foreach: { data: rates(), as: 'method'}-->
+                    <div class="shipping-method-card field choice">
+                        <div class="shipping-method-title">
+                            <!-- ko ifnot: method.error_message -->
+                            <input class="radio"
+                                       type="radio"
+                                       data-bind="
+                                value: method.carrier_code + '_' + method.method_code,
+                                checked: $parent.isSelected,
+                                attr: {
+                                    'id': 's_method_' + method.carrier_code + '_' + method.method_code,
+                                    'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code,
+                                    'disabled': $parent.isLoading
+                                },
+                                click: $parent.selectShippingMethod"/>
+                            <!-- /ko -->
+                            <!-- ko if: method.error_message -->
+                            <div class="clearfix"></div>
+                            <!-- /ko -->
+                                <label data-bind="
+                                        attr: {
+                                        'id': 'label_method_' + method.method_code + '_' + method.carrier_code,
+                                        'for': 's_method_' + method.carrier_code + '_' + method.method_code
+                                        }
+                                " class="label"><!-- ko text: method.carrier_title --><!-- /ko --></label>
+                                <div class="shipping-method-subtitle" data-bind="
+                        text: method.method_title,
+                        attr: {'id': 'label_carrier_' + method.method_code + '_' + method.carrier_code}"></div>
+                        </div>
+                        <div class="shipping-method-price">
+                        <!-- ko foreach: $parent.getRegion('price') -->
+                        <!-- ko template: getTemplate() --><!-- /ko -->
+                        <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    </div>
+                </div>
+            </form>
+            <!-- /ko -->
+            <!-- ko ifnot: rates().length > 0 -->
+            <div class="no-quotes-block"><!-- ko i18n: 'Sorry, no quotes are available for this order at this time'--><!-- /ko --></div>
+            <!-- /ko -->
+        </div>
+        
+        <div class="checkout-shipping-method-maps">
+            <!-- ko foreach: getRegion('maps') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
+        </div>
+
+        <!-- ko foreach: getRegion('delivery-date') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    </div>
+</li>
+<!-- /ko -->

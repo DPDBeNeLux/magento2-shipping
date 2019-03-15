@@ -139,7 +139,7 @@ class printShippingList extends \Magento\Backend\App\Action
             $blockInstance->setTemplate("DPDBenelux_Shipping::printshippinglist.phtml");
 
             $blockInstance->assign([
-                'sender' => $this->predictService->getSenderData(),
+                'sender' => $this->predictService->getSenderData($order),
                 'orders' => $orders
             ]);
 

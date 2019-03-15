@@ -19,15 +19,18 @@
  */
 namespace DPDBenelux\Shipping\Helper\Services;
 
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\App\Helper\AbstractHelper;
-use DPDBenelux\Shipping\Helper\DPDClient;
 use Magento\Sales\Model\Order;
+use Magento\Store\Model\ScopeInterface;
+use DPDBenelux\Shipping\Helper\DPDClient;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use DPDBenelux\Shipping\Model\ShipmentLabelsFactory;
 
 class DPDPredictService extends AbstractHelper
 {
     const DPD_PRINT_FORMAT = 'dpdshipping/account_settings/print_format';
+    const DPD_PRINT_PHONE_NUMBER = 'dpdshipping/account_settings/printPhoneNumber';
+    const DPD_PRINT_ORDER_ID = 'dpdshipping/account_settings/printOrderId';
 
     /**
      * Used to access the accesstoken, depot and delisId
@@ -215,7 +218,7 @@ class DPDPredictService extends AbstractHelper
         $delisId = $this->authenticationService->getDelisId();
         $depot = $this->authenticationService->getDepot();
 
-        $senderData = $this->getSenderData();
+        $senderData = $this->getSenderData($order);
         if ($senderData['zipCode'] == '' || $senderData['street'] == '' || $senderData['city'] == '') {
             throw new \Exception(__('[DPD] Your store address is empty. Please open the configuration and set an address'));
         }
@@ -232,7 +235,7 @@ class DPDPredictService extends AbstractHelper
         $shipmentData = [
             'printOptions' => [
                 'printerLanguage' => 'PDF',
-                'paperFormat' => $this->scopeConfig->getValue(self::DPD_PRINT_FORMAT),
+                'paperFormat' => $this->getWebsiteConfig(self::DPD_PRINT_FORMAT, $order),
             ],
             'order' => [
                 'generalShipmentData' => [
@@ -247,7 +250,7 @@ class DPDPredictService extends AbstractHelper
         $shipmentData['order']["parcels"] = [];
         for ($x = 1; $x <= $parcels; $x++) {
             $shipmentData['order']["parcels"][] = [
-                'customerReferenceNumber1' => $order->getIncrementId(),
+                'customerReferenceNumber1' => ($this->getWebsiteConfig(self::DPD_PRINT_ORDER_ID, $order, true) ? $order->getIncrementId() : null),
                 'customerReferenceNumber2' => $parcelShopId,
                 'weight' => $orderWeight / $parcels,
                 'returns' => $isReturn,
@@ -310,8 +313,8 @@ class DPDPredictService extends AbstractHelper
         }
         $labelDataSerialized = serialize($labelData);
 
-        $saveLabelAsFile = $this->scopeConfig->isSetFlag('dpdshipping/account_settings/save_label_file');
-        $labelPath = $this->scopeConfig->getValue('dpdshipping/account_settings/label_path');
+        $saveLabelAsFile = $this->getWebsiteConfig('dpdshipping/account_settings/save_label_file', $order, true);
+        $labelPath = $this->getWebsiteConfig('dpdshipping/account_settings/label_path', $order);
 
         if (empty($labelPath)) {
             $labelPath = $this->directoryList->getRoot() . '/var/dpd_labels/';
@@ -354,14 +357,14 @@ class DPDPredictService extends AbstractHelper
         ];
     }
 
-    public function getSenderData()
+    public function getSenderData(\Magento\Sales\Model\Order $order)
     {
-        $name = $this->scopeConfig->getValue('dpdshipping/sender_address/name1');
-        $street = $this->scopeConfig->getValue('dpdshipping/sender_address/street');
-        $houseNo = $this->scopeConfig->getValue('dpdshipping/sender_address/houseNo');
-        $zipCode = $this->scopeConfig->getValue('dpdshipping/sender_address/zipCode');
-        $city = $this->scopeConfig->getValue('dpdshipping/sender_address/city');
-        $country = $this->scopeConfig->getValue('dpdshipping/sender_address/country');
+        $name = $this->getStoreConfig('dpdshipping/sender_address/name1', $order);
+        $street = $this->getStoreConfig('dpdshipping/sender_address/street', $order);
+        $houseNo = $this->getStoreConfig('dpdshipping/sender_address/houseNo', $order);
+        $zipCode = $this->getStoreConfig('dpdshipping/sender_address/zipCode', $order);
+        $city = $this->getStoreConfig('dpdshipping/sender_address/city', $order);
+        $country = $this->getStoreConfig('dpdshipping/sender_address/country', $order);
         
         return [
             'name1' => $name,
@@ -369,7 +372,7 @@ class DPDPredictService extends AbstractHelper
             'houseNo' => $houseNo,
             'country' => $country,
             'zipCode' => $zipCode,
-            'city' => $city,
+            'city' => $city
         ];
     }
 
@@ -382,13 +385,14 @@ class DPDPredictService extends AbstractHelper
             $fullStreet = implode(' ', $street);
 
             $recipient = array(
-                'name1'             => $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(),
-                'name2'      => $billingAddress->getCompany(),
+                'name1'            => $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(),
+                'name2'            => $billingAddress->getCompany(),
                 'street'           => $fullStreet,
                 'houseNo'          => '',
                 'zipCode'          => strtoupper(str_replace(' ', '', $billingAddress->getPostcode())),
                 'city'             => $billingAddress->getCity(),
-                'country'      => $billingAddress->getCountryId(),
+                'country'          => $billingAddress->getCountryId(),
+                'phone'             => ($this->getWebsiteConfig(self::DPD_PRINT_PHONE_NUMBER, $order, true) ? $billingAddress->getTelephone() : null)
             );
         } else {
             $shippingAddress = $order->getShippingAddress();
@@ -397,13 +401,14 @@ class DPDPredictService extends AbstractHelper
             $fullStreet = implode(' ', $street);
 
             $recipient = array(
-                'name1'             => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
-                'name2'      => $shippingAddress->getCompany(),
+                'name1'            => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
+                'name2'            => $shippingAddress->getCompany(),
                 'street'           => $fullStreet,
                 'houseNo'          => '',
                 'zipCode'          => strtoupper(str_replace(' ', '', $shippingAddress->getPostcode())),
                 'city'             => $shippingAddress->getCity(),
-                'country'      => $shippingAddress->getCountryId(),
+                'country'          => $shippingAddress->getCountryId(),
+                'phone'            => ($this->getWebsiteConfig(self::DPD_PRINT_PHONE_NUMBER, $order, true) ? $shippingAddress->getTelephone() : null)
             );
         }
 
@@ -436,5 +441,39 @@ class DPDPredictService extends AbstractHelper
     public function getPredictEmail(\Magento\Sales\Model\Order $order)
     {
         return $order->getCustomerEmail();
+    }
+
+    public function getWebsiteConfig($path, \Magento\Sales\Model\Order $order, $isFlag = false)
+    {
+        if ($isFlag) {
+            return $this->scopeConfig->isSetFlag(
+                $path,
+                ScopeInterface::SCOPE_WEBSITE,
+                $order->getStore()->getWebsiteId()
+            );
+        }
+
+        return $this->scopeConfig->getValue(
+            $path,
+            ScopeInterface::SCOPE_WEBSITE,
+            $order->getStore()->getWebsiteId()
+        );
+    }
+
+    public function getStoreConfig($path, \Magento\Sales\Model\Order $order, $isFlag = false)
+    {
+        if ($isFlag) {
+            return $this->scopeConfig->isSetFlag(
+                $path,
+                ScopeInterface::SCOPE_STORE,
+                $order->getStoreId()
+            );
+        }
+
+        return $this->scopeConfig->getValue(
+            $path,
+            ScopeInterface::SCOPE_STORE,
+            $order->getStoreId()
+        );
     }
 }

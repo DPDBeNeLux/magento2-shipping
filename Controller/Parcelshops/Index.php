@@ -69,7 +69,22 @@ class Index extends \Magento\Framework\App\Action\Action
             $LATITUDE = $obj->results[0]->geometry->location->lat;
             $LONGITUDE = $obj->results[0]->geometry->location->lng;
         } catch (\Exception $ex) {
-            echo $ex->getMessage();
+            // echo $ex->getMessage();
+            return null;
+        }
+        return [$LATITUDE, $LONGITUDE];
+    }
+
+    public function getGoogleMapsCenterByQuery($query)
+    {
+        try {
+            $apiKey = $this->data->getGoogleMapsApiKey();
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' . $apiKey . '&address=' . urlencode($query) . '&sensor=false';
+            $source = file_get_contents($url);
+            $obj = json_decode($source);
+            $LATITUDE = $obj->results[0]->geometry->location->lat;
+            $LONGITUDE = $obj->results[0]->geometry->location->lng;
+        } catch (\Exception $ex) {
             return null;
         }
         return [$LATITUDE, $LONGITUDE];
@@ -91,13 +106,23 @@ class Index extends \Magento\Framework\App\Action\Action
 
         $post = $this->getRequest()->getPostValue();
 
-        if (!isset($post['postcode']) || !isset($post['countryId'])) {
+        if (!isset($post['query']) && (!isset($post['postcode']) || !isset($post['countryId']))) {
             $resultData['success'] = false;
             $resultData['error_message'] = __('No address found');
+
             return $result->setData($resultData);
         }
 
-        $coordinates = $this->getGoogleMapsCenter($post['postcode'], $post['countryId']);
+        $coordinates = null;
+
+        if (isset($post['query'])) {
+            $coordinates = $this->getGoogleMapsCenterByQuery($post['query']);
+        }
+
+        if (isset($post['postcode']) && isset($post['countryId'])) {
+            $coordinates = $this->getGoogleMapsCenter($post['postcode'], $post['countryId']);
+        }
+
         if ($coordinates == null) {
             $resultData['success'] = false;
             $resultData['error_message'] = __('No address found');
@@ -142,6 +167,41 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     /**
+     * Gets the opening hours in HTML format.
+     *
+     * @param $openMorning
+     * @param $closeMorning
+     * @param $openAfternoon
+     * @param $closeAfternoon
+     * @param $weekday
+     *
+     * @return string
+     */
+    protected function _getOpeningHoursHtml($openMorning, $closeMorning, $openAfternoon, $closeAfternoon, $weekday)
+    {
+        $openingHoursMorning = $openMorning . ' - ' . $closeMorning;
+        $openingHoursAfternoon = $openAfternoon . ' - ' . $closeAfternoon;
+
+        if ($openingHoursMorning === '00:00 - 00:00') {
+            $openingHoursMorning = __('Closed');
+        }
+
+        if ($openingHoursAfternoon == '00:00 - 00:00') {
+            $openingHoursAfternoon = __('Closed');
+        }
+
+        $html = '
+            <tr>
+                <td style="padding: 3px; border: none;"></td>
+                <td style="padding: 3px; width: 33%;"><strong>' . __(strtolower($weekday)) . '</strong></td>
+                <td style="padding: 3px; width: 33%; text-align: center;">' . $openingHoursMorning . '</td>
+                <td style="padding: 3px; width: 33%; text-align: center;">' . $openingHoursAfternoon . '</td>
+            </tr>';
+
+        return $html;
+    }
+
+    /**
      * Gets html for the marker info bubbles.
      *
      * @param $shop
@@ -153,60 +213,60 @@ class Index extends \Magento\Framework\App\Action\Action
         $image = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/dpd_parcelshop_logo.png', array('_secure' => $this->getRequest()->isSecure()));
         $routeIcon = $this->assetRepo->getUrlWithParams('DPDBenelux_Shipping::images/icon_route.png', array('_secure' => $this->getRequest()->isSecure()));
 
-        $html = '<div class="content">
-            <table style="min-width:250px" cellpadding="3" cellspacing="3" border="0">
-                <tbody>
-                    <tr>
-                        <td rowspan="3" width="90" style="padding-top:3px; padding-bottom:3px;"><img class="parcelshoplogo bubble" style="width:80px; height:62px;" src="' . $image . '" alt="logo"/></td>
-                        <td><strong>' . ($special ? $shop->getParcelshopPudoName() : $shop->company) . '</strong></td>
-                    </tr>
-                    <tr>
-                        <td style="padding-top:3px; padding-bottom:3px;">' . ($special ? $shop->getData('parcelshop_address_1') : $shop->street . " " . $shop->houseNo) . '</td>
-                    </tr>
-                    <tr>
-                        <td style="padding-top:3px; padding-bottom:3px;">' . ($special ? $shop->getParcelshopPostCode() . ' ' . $shop->getParcelshopTown() : $shop->zipCode . ' ' . $shop->city) . '</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="dpdclear"></div>
-            ';
-
+        $html = '
+            <div class="content">
+                <table style="min-width: 380px" cellpadding="3" cellspacing="3">
+                    <tbody>
+                        <tr>
+                            <td style="padding: 3px; padding-right: 15px;" rowspan="2">
+                                <img class="parcelshoplogo bubble" style="width: 80px; height: 80px;" src="' . $image . '" alt="DPD Parcelshop logo"/>
+                            </td>
+                            <td style="padding: 3px; padding-top: 6px; width: 100%;" colspan="3">
+                                <strong>' . ($special ? $shop->getParcelshopPudoName() : $shop->company) . '</strong><br />
+                                ' . ($special ? $shop->getData('parcelshop_address_1') : $shop->street . " " . $shop->houseNo) . '<br />
+                                ' . ($special ? $shop->getParcelshopPostCode() . ' ' . $shop->getParcelshopTown() : $shop->zipCode . ' ' . $shop->city) . '
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px; padding-top: 6px; width: 100%;" colspan="3">
+                                <strong>Openingstijden</strong>
+                            </td>
+                        </tr>';
 
         if (!$special && isset($shop->openingHours) && $shop->openingHours != "") {
-            $html .= '<div class="dotted-line">
-            <table>
-            <tbody>';
             foreach ($shop->openingHours as $openinghours) {
-                $html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . __($openinghours->weekday) . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openMorning . ' - ' . $openinghours->closeMorning . '
-            </td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openAfternoon . ' - ' . $openinghours->closeAfternoon . '</td></tr>';
+                $html .= $this->_getOpeningHoursHtml(
+                    $openinghours->openMorning,
+                    $openinghours->closeMorning,
+                    $openinghours->openAfternoon,
+                    $openinghours->closeAfternoon,
+                    $openinghours->weekday
+                );
             }
-            $html .= '</tbody>
-            </table>
-            </div><div class="dpdclear"></div>';
-        } elseif ($special && $shop->getParcelshopOpeninghours() && $shop->getParcelshopOpeninghours()!="") {
-            $html .= '<div class="dotted-line">
-            <table>
-            <tbody>';
+        }
+        else {
             foreach (json_decode($shop->getParcelshopOpeninghours()) as $openinghours) {
-                $html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . $openinghours['weekday'] . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours['openMorning'] . ' - ' . $openinghours['closeMorning'] . '
-            </td><td>' . $openinghours['openAfternoon'] . ' - ' . $openinghours['closeAfternoon'] . '</td></tr>';
+                $html .= $this->_getOpeningHoursHtml(
+                    $openinghours['openMorning'],
+                    $openinghours['closeMorning'],
+                    $openinghours['openAfternoon'],
+                    $openinghours['closeAfternoon'],
+                    $openinghours['weekday']
+                );
             }
-            $html .= '</tbody>
-            </table>
-            </div><div class="dpdclear"></div>';
         }
 
+        $html .= '
+                        <tr>
+                            <td style="padding: 3px; border: none;"></td>
+                            <td style="padding: 3px; width: 100%;" colspan="3">
+                                <a class="parcelshoplink" id="' . ($special ? $shop->getParcelshopDelicomId() : $shop->parcelShopId) . '" href="#">' . __('Select Parcelshop') . '</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>';
 
-        $html .= '<div class="dotted-line">
-                    <table>
-                        <tbody>
-                            <tr style="cursor: pointer;">
-                                <td id="' . ($special ? $shop->getParcelshopDelicomId() : $shop->parcelShopId) . '" class="parcelshoplink" style="width: 25px;"><img src="'.$routeIcon .'" alt="route" width="16" height="16" ></td>
-                                <td id="' . ($special ? $shop->getParcelshopDelicomId() : $shop->parcelShopId) . '" class="parcelshoplink"><strong>' . __('Ship to this Pickup point.') . '</strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                  </div></div><div class="dpdclear"></div>';
         return $html;
     }
 }

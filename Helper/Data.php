@@ -19,10 +19,11 @@
  */
 namespace DPDBenelux\Shipping\Helper;
 
-use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Sales\Model\Order;
-use DPDBenelux\Shipping\Helper\Services\DPDPredictService;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\App\Helper\AbstractHelper;
 use \Magento\Sales\Model\Convert\Order as OrderConvert;
+use DPDBenelux\Shipping\Helper\Services\DPDPredictService;
 use DPDBenelux\Shipping\Model\ShipmentLabelsFactory;
 
 class Data extends AbstractHelper
@@ -80,7 +81,7 @@ class Data extends AbstractHelper
 
     public function getGoogleMapsApiKey()
     {
-        return $this->scopeConfig->getValue(self::DPD_GOOGLE_MAPS_API);
+        return $this->scopeConfig->getValue(self::DPD_GOOGLE_MAPS_API, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -94,7 +95,11 @@ class Data extends AbstractHelper
      */
     public function createShipment(Order $order, Order\Shipment $shipment = null, $parcels = 1, $isReturn = false)
     {
-        $includeReturnLabel = $this->scopeConfig->getValue('dpdshipping/account_settings/includeReturnLabel');
+        $includeReturnLabel = $this->scopeConfig->getValue(
+            'dpdshipping/account_settings/includeReturnLabel',
+            ScopeInterface::SCOPE_WEBSITE,
+            $order->getStore()->getWebsiteId()
+        );
 
         // Check if shipment variable if set, if not, check if order has a snipment
         if ($shipment === null) {

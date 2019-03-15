@@ -69,14 +69,26 @@ class ParcelshopInfo extends \Magento\Framework\View\Element\Template
     {
         $html = "";
         if (is_array(json_decode($dpdExtraInfo))) {
-                $html .= '<table>
-							<tbody>';
             foreach (json_decode($dpdExtraInfo) as $openinghours) {
-                $html .= '<tr><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;"><strong>' . __($openinghours->weekday) . '</strong></td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openMorning . ' - ' . $openinghours->closeMorning . '
-								</td><td style="padding-right:10px; padding-top:3px; padding-bottom:3px;">' . $openinghours->openAfternoon . ' - ' . $openinghours->closeAfternoon . '</td></tr>';
+                $openingHoursMorning = $openinghours->openMorning . ' - ' . $openinghours->closeMorning;
+                $openingHoursAfternoon = $openinghours->openAfternoon . ' - ' . $openinghours->closeAfternoon;
+
+                if ($openingHoursMorning == '00:00 - 00:00') {
+                    $openingHoursMorning = __('Closed');
+                }
+
+                if ($openingHoursAfternoon == '00:00 - 00:00') {
+                    $openingHoursAfternoon = __('Closed');
+                }
+
+                $html .= '
+                    <tr>
+                        <td style="padding: 3px; border: none;"></td>
+                        <td style="padding: 3px; width: 25%;"><strong>' . __(strtolower($openinghours->weekday)) . '</strong></td>
+                        <td style="padding: 3px; width: 25%; text-align: center;">' . $openingHoursMorning . '</td>
+                        <td style="padding: 3px; width: 25%; text-align: center;">' . $openingHoursAfternoon . '</td>
+                    </tr>';
             }
-                            $html .= '</tbody>
-							</table>';
         } else {
             $html .= $dpdExtraInfo;
         }

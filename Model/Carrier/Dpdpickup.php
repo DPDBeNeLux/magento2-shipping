@@ -154,7 +154,13 @@ class Dpdpickup extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
      */
     public function collectRates(RateRequest $request)
     {
-        if ($this->_scopeConfig->getValue("dpdshipping/account_settings/account_type") !== "B2C") {
+        $accountType = $this->_scopeConfig->getValue(
+            'dpdshipping/account_settings/account_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStore()
+        );
+
+        if ($accountType !== 'B2C') {
             return false;
         }
 

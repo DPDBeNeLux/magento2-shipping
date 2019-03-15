@@ -22,27 +22,22 @@
     <group id="account_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
            showInStore="1">
         <label>Account settings</label>
-        <field id="mode_type" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
-               showInStore="0">
+        <field id="mode_type" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
             <label>Environment</label>
             <source_model>DPDBenelux\Shipping\Config\Source\Settings\Environment</source_model>
         </field>
-        <field id="username" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="1">
+        <field id="username" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Username</label>
         </field>
-        <field id="password" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="1">
+        <field id="password" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Password</label>
             <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
         </field>
-        <field id="print_format" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="1">
+        <field id="print_format" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Print format</label>
             <source_model>DPDBenelux\Shipping\Config\Source\Settings\PrintFormat</source_model>
         </field>
-        <field id="account_type" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="0">
+        <field id="account_type" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>DPD Account Type</label>
             <source_model>DPDBenelux\Shipping\Config\Source\Settings\AccountType</source_model>
         </field>
@@ -69,6 +64,16 @@
                 <field id="dpdshipping/account_settings/save_label_file">1</field>
             </depends>
             <comment>The default directory is '/var/dpd_labels' in your Magento directory. Use full path if you want to use a custom directory.</comment>
+        </field>
+        <field id="printPhoneNumber" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Print phone number on label</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="printOrderId" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Print order Id on label</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
     </group>
 	<group id="sender_address" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"

@@ -21,58 +21,39 @@ $parcelshop = $this->getParcelshop();
 $quote = $this->getQuote();
 $dpdExtraInfoDecoded = json_decode($parcelshop['extra_info']);
 ?>
-<div id="map_canvas" class="gmaps" style="height: 430px; width: 600px; position: relative; overflow: hidden;">
-	<div id="parcelshop" class="parcelshopwrapper">
-		<div class="dpd-shop-header">
-			<div class="dpd-shop-logo">
-				<img
-						src="<?php echo $this->getViewFileUrl('DPDBenelux_Shipping::images/dpd_parcelshop_logo.png') ?>"
-						alt="shop logo"/>
-			</div>
-			<div class="dpd-shop-address">
-				<p class="dpd-text"><b><?php echo $quote->getDpdCompany() ?></b></p>
-				<p class="dpd-text"><?php echo $quote->getDpdStreet() ?></p>
-				<p class="dpd-text"><?php echo $quote->getDpdZipcode() . " " . $quote->getDpdCity() ?></p>
-				<p class="dpd-text"><?php echo $this->getCountry($quote->getDpdCountry()); ?></p>
-			</div>
-		</div>
-		<div class="dpd-shop-openinghours">
-			<?php if ($extraInfoArray = get_object_vars($dpdExtraInfoDecoded)): ?>
-				<?php foreach ($extraInfoArray as $key => $dpdExtraInfo): ?>
-					<p class="dpd-shop-openinghours-name"><?php echo __($key); ?></p>
-					<?php if ($key == "Opening hours"): ?>
-						<div class="dpd-shop-openinghours-table">
-							<?php echo __($this->getOpeningHoursHtml($dpdExtraInfo)) ?>
-						</div>
-					<?php endif; ?>
-				<?php endforeach ?>
-			<?php endif; ?>
-		</div>
-		<div class="dpd-shop-change">
-			<a href="#" class="invalidateParcel"><?php echo __('Click here to change your ParcelShop'); ?></a>
-			<input type="hidden" class="DPD-confirmed" value="1"/>
-			<input type="hidden" class="parcelshopId" value="<?php echo $quote->getDpdParcelshopId() ?>" />
-		</div>
-	</div>
+<div class="content">
+    <table style="min-width: 380px" cellpadding="3" cellspacing="3">
+        <tbody>
+            <tr>
+                <td style="padding: 3px; padding-right: 15px;" rowspan="2">
+                    <img style="width: 80px; height: 80px;" src="<?php echo $this->getViewFileUrl('DPDBenelux_Shipping::images/dpd_parcelshop_logo.png') ?>" alt="DPD Parcelshop logo"/>
+                </td>
+                <td style="padding: 3px; padding-top: 6px; width: 100%;" colspan="3">
+                    <strong><?php echo $quote->getDpdCompany() ?></strong><br />
+                    <?php echo $quote->getDpdStreet() ?><br />
+                    <?php echo $quote->getDpdZipcode() . " " . $quote->getDpdCity() ?>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 3px; padding-top: 6px; width: 100%;" colspan="3">
+                    <strong>Openingstijden</strong>
+                </td>
+            </tr>
+            <?php if ($extraInfoArray = get_object_vars($dpdExtraInfoDecoded)): ?>
+                <?php foreach ($extraInfoArray as $key => $dpdExtraInfo): ?>
+                    <?php if ($key == "Opening hours"): ?>
+                        <?php echo __($this->getOpeningHoursHtml($dpdExtraInfo)) ?>
+                    <?php endif; ?>
+                <?php endforeach ?>
+            <?php endif; ?>
+            <tr>
+                <td style="padding: 3px; border: none;"></td>
+                <td style="padding: 3px; width: 100%;" colspan="3">
+                    <a href="#" class="invalidateParcel"><?php echo __('Click here to change your ParcelShop'); ?></a>
+                    <input type="hidden" class="DPD-confirmed" value="1"/>
+                    <input type="hidden" class="parcelshopId" value="<?php echo $quote->getDpdParcelshopId() ?>" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
-<style>
-	.dpd-shop-header {
-		height: 100px;
-	}
-	.dpd-shop-logo {
-		display: inline-block;
-	}
-	.dpd-shop-address {
-		display: inline-block;
-		padding-left: 5px;
-	}
-	.dpd-text {
-		margin: 0px;
-	}
-	.dpd-shop-openinghours-name {
-		font-size: 1.1em;
-		font-weight: bold;
-		margin-top: 10px;
-		margin-bottom: 5px;
-	}
-</style>

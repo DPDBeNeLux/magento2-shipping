@@ -18,6 +18,9 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="DPDBenelux_Shipping/css/parcelshop.css" />
+    </head>
     <body>
         <referenceBlock name="checkout.root">
             <arguments>
@@ -25,6 +28,16 @@
                     <item name="components" xsi:type="array">
                         <item name="checkout" xsi:type="array">
                             <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+
 								<item name="sidebar" xsi:type="array">
 									<item name="children" xsi:type="array">
 										<item name="dpdbenelux-shipping-parcelshop-info" xsi:type="array">
@@ -37,6 +50,13 @@
 									</item>
 								</item>
 
+                                <item name="shipping-rates-validation" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="dpdbenelux-provider-rates-validation" xsi:type="array">
+                                            <item name="component" xsi:type="string">DPDBenelux_Shipping/js/view/shipping-rates-validation</item>
+                                        </item>
+                                    </item>
+                                </item>
                             </item>
                         </item>
                     </item>
