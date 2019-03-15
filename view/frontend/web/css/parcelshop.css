@@ -1,0 +1,175 @@
+@media all and (min-width: 768px) {
+    #checkout-shipping-method-load .table-checkout-shipping-method {
+        width: 100%;
+    }
+}
+
+.dpd-shop-header {
+    height: 100px;
+}
+
+.dpd-shop-logo {
+    display: inline-block;
+}
+
+.dpd-shop-address {
+    display: inline-block;
+    padding-left: 5px;
+}
+
+.dpd-text {
+    margin: 0px;
+}
+
+.dpd-shop-openinghours-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.dpd-shipping-information p {
+    margin-bottom: 3px;
+}
+
+#map_canvas {
+    height: 430px;
+    width: 70%;
+    float: left;
+    position: relative;
+    overflow: hidden;
+}
+
+#map_container {
+    position: relative;
+}
+
+#map_container::after {
+    display: block;
+    clear: both;
+    content: "";
+}
+
+#parcel_shop_list {
+    width: 30%;
+    float: left;
+    padding-left: 0;
+    list-style: none;
+    overflow: auto;
+}
+
+#parcel_shop_list li {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    margin: 0;
+    font-size: 12px;
+}
+
+#parcel_shop_list .company {
+    font-weight: bold;
+}
+
+#parcel_shop_list .company,
+#parcel_shop_list .houseno {
+    display: block;
+}
+
+a.parcelshoplink {
+    display: block;
+    background-color: #dc0032;
+    color: #fff;
+    margin-top: 5px;
+    padding: 6px 10px;
+    text-align: center;
+}
+
+a.parcelshoplink:hover {
+    background-color: #b7002a;
+    text-decoration: none;
+}
+
+#map_container .search-shipping-address {
+    position: absolute;
+    left: calc(30% + 10px);
+    top: 10px;
+    display: block;
+    width: auto;
+    height: 20px;
+    padding: 10px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+    color: #666;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 2px;
+    overflow: hidden;
+    transition: width 0.2s ease-in-out;
+    z-index: 1;
+}
+
+#map_container .search-shipping-address:hover {
+    color: #000;
+}
+
+#map_container .search-shipping-address .container {
+    width: 242px;
+}
+
+#map_container .search-shipping-address .container .text {
+    border: none;
+    display: inline-block;
+    width: 199px;
+    margin-left: 10px;
+}
+
+#map_container .search-shipping-address .container .text:focus {
+    box-shadow: none;
+}
+
+#map_container .search-shipping-address .container .image {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    border-right: 1px solid #ccc;
+    padding-right: 10px;
+}
+
+#map_container .error_message {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: white;
+    text-align: center;
+    line-height: 400px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease-in-out;
+    z-index: 2;
+}
+
+#map_container .error_message:hover {
+    box-shadow: inset 0 0 20px 2px black;
+}
+
+@media (max-width: 1100px) {
+    #map_canvas > div:not(#parcelshop):not(.content) {
+        display: none;
+    }
+
+    #map_container .search-shipping-address {
+        display: none !important;
+    }
+
+    #parcel_shop_list {
+        width: 100%;
+    }
+
+    #parcel_shop_list a {
+        text-align: left;
+    }
+}

@@ -31,31 +31,31 @@ class DaysInWeek implements ArrayInterface
         $options = array(
             array(
                 'value' => '1',
-                'label' => __('Monday'),
+                'label' => __('monday'),
             ),
             array(
                 'value' => '2',
-                'label' => __('Tuesday'),
+                'label' => __('tuesday'),
             ),
             array(
                 'value' => '3',
-                'label' => __('Wednesday'),
+                'label' => __('wednesday'),
             ),
             array(
                 'value' => '4',
-                'label' => __('Thursday'),
+                'label' => __('thursday'),
             ),
             array(
                 'value' => '5',
-                'label' => __('Friday'),
+                'label' => __('friday'),
             ),
             array(
                 'value' => '6',
-                'label' => __('Saturday'),
+                'label' => __('saturday'),
             ),
             array(
                 'value' => '7',
-                'label' => __('Sunday'),
+                'label' => __('sunday'),
             ),
         );
         return $options;

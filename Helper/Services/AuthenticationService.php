@@ -19,8 +19,13 @@
  */
 namespace DPDBenelux\Shipping\Helper\Services;
 
-use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\App\Helper\Context;
 use DPDBenelux\Shipping\Helper\DPDClient;
+use Magento\Framework\Encryption\Encryptor;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 
 class AuthenticationService extends AbstractHelper
 {
@@ -42,11 +47,11 @@ class AuthenticationService extends AbstractHelper
     private $crypt;
 
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+        Context $context,
+        DirectoryList $directoryList,
         DPDClient $dpdClient,
-        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
-        \Magento\Framework\Encryption\Encryptor $crypt
+        WriterInterface $configWriter,
+        Encryptor $crypt
     ) {
         $this->directoryList = $directoryList;
         $this->dpdClient = $dpdClient;

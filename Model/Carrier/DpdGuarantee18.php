@@ -154,7 +154,13 @@ class DpdGuarantee18 extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      */
     public function collectRates(RateRequest $request)
     {
-        if ($this->_scopeConfig->getValue("dpdshipping/account_settings/account_type") !== "B2B") {
+        $accountType = $this->_scopeConfig->getValue(
+            'dpdshipping/account_settings/account_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStore()
+        );
+
+        if ($accountType !== 'B2B') {
             return false;
         }
 

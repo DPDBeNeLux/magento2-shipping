@@ -25,6 +25,7 @@
                 <account_type>B2C</account_type>
                 <picqer_mode>0</picqer_mode>
                 <save_label_file>0</save_label_file>
+                <printOrderId>1</printOrderId>
             </account_settings>
         </dpdshipping>
         <carriers>

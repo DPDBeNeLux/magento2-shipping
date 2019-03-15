@@ -1,19 +1,46 @@
 {
-    "name": "dpdbenelux/magento2-shipping",
-    "description": "A Magento 2 shipping method",
-    "require": {
-      "php": ">=7.0.13"
-    },
-    "type": "magento2-module",
-    "license": [
-        "GPL-3.0-or-later"
-    ],
-    "autoload": {
+  "name": "dpdbenelux/magento2-shipping",
+  "description": "DPD Magento2 Shipping extension",
+  "require": {
+      "php": ">=7.0.13",
+      "magento/framework": ">=100.1.0,<=100.1.16|>=101.0.0,<=101.0.7|>=102.0.0",
+      "setasign/fpdi-fpdf": "2.1",
+      "zendframework/zend-barcode" : "2.7"
+  },
+  "type": "magento2-module",
+  "license": "GPL-3.0-or-later",
+  "version": "1.2.0",
+  "authors": [
+      {
+          "name": "DPD",
+          "email": "pluginsupport@dpd.nl",
+          "homepage": "http://www.dpd.nl"
+      }
+  ],
+  "support": {
+    "email": "pluginsupport@dpd.nl",
+    "issues": "http://www.dpd.nl/"
+  },
+  "homepage": "https://www.dpd.com/nl/business_customers/hulp_en_tools/e_commerce/magento",
+  "keywords": ["dpd", "dpd parcelservice", "Magento2"],
+  "minimum-stability": "stable",
+  "autoload": {
       "files": [
-        "registration.php"
+          "registration.php"
       ],
       "psr-4": {
-        "DPDBenelux\\Shipping\\": ""
+          "DPDBenelux\\Shipping\\": ""
       }
-    }
+  },
+  "require-dev": {
+      "object-calisthenics/phpcs-calisthenics-rules": "^3.0",
+      "magento/marketplace-eqp": "^2.0",
+      "overtrue/phplint": "^1.1"
+  },
+  "repositories": {
+      "magento": {
+          "type": "composer",
+          "url": "https://repo.magento.com/"
+      }
+  }
 }
