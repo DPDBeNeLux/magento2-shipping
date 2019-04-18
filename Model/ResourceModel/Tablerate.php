@@ -61,14 +61,14 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      *
      * @var array
      */
-    protected $_importIso2Countries;
+    protected $importIso2Countries;
 
     /**
      * Array of countries keyed by iso3 code
      *
      * @var array
      */
-    protected $_importIso3Countries;
+    protected $importIso3Countries;
 
     /**
      * Associative array of countries and regions
@@ -76,14 +76,19 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      *
      * @var array
      */
-    protected $_importRegions;
+    protected $importRegions;
 
     /**
      * Import Table Rate condition name
      *
      * @var string
      */
-    protected $_importConditionName;
+    protected $importConditionName;
+
+    /**
+     * @var string
+     */
+    protected $shippingMethod;
 
     /**
      * Array of condition full names
@@ -115,6 +120,15 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * @since 100.1.0
      */
     protected $carrierTablerate;
+
+    /**
+     * @var \Magento\Directory\Model\ResourceModel\Country\CollectionFactory
+     */
+    protected $countryCollectionFactory;
+    /**
+     * @var \Magento\Directory\Model\ResourceModel\Region\CollectionFactory
+     */
+    protected $regionCollectionFactory;
 
     /**
      * Filesystem instance
@@ -152,6 +166,9 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         \Magento\Framework\App\Config\ScopeConfigInterface $coreConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\OfflineShipping\Model\Carrier\Tablerate $carrierTablerate,
+        \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
+        \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory,
+        \Magento\Framework\Filesystem\Directory\ReadFactory $readFactory,
         \Magento\Framework\Filesystem $filesystem,
         Import $import,
         RateQueryFactory $rateQueryFactory,
@@ -162,6 +179,9 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $this->logger = $logger;
         $this->storeManager = $storeManager;
         $this->carrierTablerate = $carrierTablerate;
+        $this->countryCollectionFactory = $countryCollectionFactory;
+        $this->regionCollectionFactory = $regionCollectionFactory;
+        $this->readFactory = $readFactory;
         $this->filesystem = $filesystem;
         $this->import = $import;
         $this->rateQueryFactory = $rateQueryFactory;
@@ -247,9 +267,8 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         }
         $connection->commit();
     }
-        /**
-     * Upload table rate file and import data from it
-     *
+
+    /**
      * @param \Magento\Framework\DataObject $object
      * @throws \Magento\Framework\Exception\LocalizedException
      * @return \Magento\OfflineShipping\Model\ResourceModel\Carrier\Tablerate
@@ -261,70 +280,229 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     public function uploadAndImport(\Magento\Framework\DataObject $object)
     {
         foreach ($_FILES['groups']['tmp_name'] as $key => $value) {
+            
             // Only process uploaded DPD files
             if (strpos($key, 'dpd') !== 0) {
                 continue;
             }
 
-            $filePath = $value['fields']['import']['value'];
+            $csvFile = $value['fields']['import']['value'];
 
-            if ($filePath == '') {
+            if ($csvFile == '') {
                 continue;
             }
 
-            $shippingMethod = $key;
-            $websiteId = $this->storeManager->getWebsite($object->getScopeId())->getId();
+            $website = $this->storeManager->getWebsite($object->getScopeId());
 
-            // Get it from the posted object, the config is not yet updated and obviously has cache issues.
-            $conditionName = $this->getConditionName($object, $shippingMethod);
+            $this->importWebsiteId = (int)$website->getId();
+            $this->importUniqueHash = [];
+            $this->importErrors = [];
+            $this->importedRows = 0;
 
-            //$conditionName = $this->coreConfig->getValue('carriers/'.$shippingMethod.'/condition_name',
-            //  \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
-            //  $websiteId);
+            $tmpDirectory = ini_get('upload_tmp_dir') ? $this->readFactory->create(ini_get('upload_tmp_dir'))
+                : $this->filesystem->getDirectoryRead(DirectoryList::SYS_TMP);
+            $path = $tmpDirectory->getRelativePath($csvFile);
+            $stream = $tmpDirectory->openFile($path);
 
-            $file = $this->getCsvFile($filePath);
+            // check and skip headers
+            $headers = $stream->readCsv();
+            if ($headers === false || count($headers) < 5) {
+                $stream->close();
+                throw new \Magento\Framework\Exception\LocalizedException(__('Please correct Table Rates File Format.'));
+            }
 
+            $this->shippingMethod = $key;
+            $this->importConditionName = $this->getConditionName($object, $object->getGroupId());
+            $adapter = $this->getConnection();
+            $adapter->beginTransaction();
             try {
-                // delete old data by website, condition name and shipping method
+                $rowNumber = 1;
+                $importData = [];
+                $this->_loadDirectoryCountries();
+                $this->_loadDirectoryRegions();
+
+                // delete old data by website and condition name
                 $condition = [
-                    'website_id = ?' => $websiteId,
-                    'condition_name = ?' => $conditionName,
-                    'shipping_method = ?' => $shippingMethod,
+                    'website_id = ?' => $this->importWebsiteId,
+                    'condition_name = ?' => $this->importConditionName,
+                    'shipping_method = ?' => $this->shippingMethod
                 ];
-                $this->deleteByCondition($condition);
-
-                // Helper method to have the selected shipping method available in the importer
-                $this->import->setShippingMethod($shippingMethod);
-
-                $columns = $this->import->getColumns();
-                $conditionFullName = $this->_getConditionFullName($conditionName);
-                foreach ($this->import->getData($file, $websiteId, $conditionName, $conditionFullName) as $bunch) {
-                    // Add the chosen shipping method to the import data
-                    $columns[] = 'shipping_method';
-
-                    foreach ($bunch as &$item) {
-                        $item['shipping_method'] = $shippingMethod;
+                $adapter->delete($this->getMainTable(), $condition);
+                while (false !== ($csvLine = $stream->readCsv())) {
+                    $rowNumber++;
+                    if (empty($csvLine)) {
+                        continue;
                     }
-
-                    $this->importData($columns, $bunch);
+                    $row = $this->_getImportRow($csvLine, $rowNumber);
+                    if ($row !== false) {
+                        $importData[] = $row;
+                    }
+                    if (count($importData) == 5000) {
+                        $this->_saveImportData($importData);
+                        $importData = [];
+                    }
                 }
+                $this->_saveImportData($importData);
+                $stream->close();
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                $adapter->rollback();
+                $stream->close();
+                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
             } catch (\Exception $e) {
+                $adapter->rollback();
+                $stream->close();
                 $this->logger->critical($e);
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('Something went wrong while importing table rates.')
                 );
-            } finally {
-                $file->close();
             }
 
-            if ($this->import->hasErrors()) {
+            $adapter->commit();
+            if ($this->importErrors) {
                 $error = __(
                     'We couldn\'t import this file because of these errors: %1',
-                    implode(" \n", $this->import->getErrors())
+                    implode(" \n", $this->importErrors)
                 );
                 throw new \Magento\Framework\Exception\LocalizedException($error);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Validate row for import and return table rate array or false
+     * Error will be add to importErrors array
+     *
+     * @param array $row
+     * @param int $rowNumber
+     * @return array|false
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    protected function _getImportRow($row, $rowNumber = 0)
+    {
+        // validate row
+        if (count($row) < 4) {
+            $this->importErrors[] =
+                __('Please correct Matrix Rates format in Row #%1. Invalid Number of Rows', $rowNumber);
+            return false;
+        }
+
+        // strip whitespace from the beginning and end of each row
+        foreach ($row as $k => $v) {
+            $row[$k] = trim($v);
+        }
+
+        // validate country
+        if (isset($this->importIso2Countries[$row[0]])) {
+            $countryId = $this->importIso2Countries[$row[0]];
+        } elseif (isset($this->importIso3Countries[$row[0]])) {
+            $countryId = $this->importIso3Countries[$row[0]];
+        } elseif ($row[0] == '*' || $row[0] == '') {
+            $countryId = '0';
+        } else {
+            $this->importErrors[] = __('Please correct Country "%1" in Row #%2.', $row[0], $rowNumber);
+            return false;
+        }
+        // validate region
+        if ($countryId != '0' && isset($this->importRegions[$countryId][$row[1]])) {
+            $regionId = $this->importRegions[$countryId][$row[1]];
+        } elseif ($row[1] == '*' || $row[1] == '') {
+            $regionId = 0;
+        } else {
+            $this->importErrors[] = __('Please correct Region/State "%1" in Row #%2.', $row[1], $rowNumber);
+            return false;
+        }
+
+        // detect zip code
+        if ($row[2] == '*' || $row[2] == '') {
+            $zipCode = '*';
+        } else {
+            $zipCode = $row[2];
+        }
+
+        $value = $row[3];
+        $price = $this->_parseDecimalValue($row[4]);
+        $cost = 0;
+
+        // protect from duplicate
+        $hash = sprintf(
+            "%s-%s-%s-%s-%F-%F-%s",
+            $countryId,
+            $regionId,
+            $zipCode,
+            $value,
+            $price,
+            $cost,
+            $this->shippingMethod
+        );
+
+        if (isset($this->importUniqueHash[$hash])) {
+            $this->importErrors[] = __(
+                'Duplicate Row #%1 (Country "%2", Region/State "%3", Zip from "%4", Value "%5", and Shipping Method "%8")',
+                $rowNumber,
+                $countryId,
+                $regionId,
+                $zipCode,
+                $value,
+                $price,
+                $cost,
+                $this->shippingMethod
+            );
+            return false;
+        }
+        $this->importUniqueHash[$hash] = true;
+        return [
+            $this->importWebsiteId,      // website_id
+            $countryId,                  // dest_country_id
+            $regionId,                   // dest_region_id,
+            $zipCode,                    // dest_zip
+            $this->importConditionName,  // condition_name,
+            $value,                      // condition_value From
+            $price,                      // price
+            $cost,                       // cost
+            $this->shippingMethod              // shipping method
+        ];
+    }
+
+    /**
+     * Load directory countries
+     *
+     * @return \WebShopApps\MatrixRate\Model\ResourceModel\Carrier\Matrixrate
+     */
+    protected function _loadDirectoryCountries()
+    {
+        if ($this->importIso2Countries !== null && $this->importIso3Countries !== null) {
+            return $this;
+        }
+        $this->importIso2Countries = [];
+        $this->importIso3Countries = [];
+        /** @var $collection \Magento\Directory\Model\ResourceModel\Country\Collection */
+        $collection = $this->countryCollectionFactory->create();
+        foreach ($collection->getData() as $row) {
+            $this->importIso2Countries[$row['iso2_code']] = $row['country_id'];
+            $this->importIso3Countries[$row['iso3_code']] = $row['country_id'];
+        }
+        return $this;
+    }
+    /**
+     * Load directory regions
+     *
+     * @return \WebShopApps\MatrixRate\Model\ResourceModel\Carrier\Matrixrate
+     */
+    protected function _loadDirectoryRegions()
+    {
+        if ($this->importRegions !== null) {
+            return $this;
+        }
+        $this->importRegions = [];
+        /** @var $collection \Magento\Directory\Model\ResourceModel\Region\Collection */
+        $collection = $this->regionCollectionFactory->create();
+        foreach ($collection->getData() as $row) {
+            $this->importRegions[$row['country_id']][$row['code']] = (int)$row['region_id'];
+        }
+        return $this;
     }
 
     /**
@@ -370,6 +548,25 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     }
 
     /**
+     * Parse and validate positive decimal value
+     * Return false if value is not decimal or is not positive
+     *
+     * @param string $value
+     * @return bool|float
+     */
+    protected function _parseDecimalValue($value)
+    {
+        if (!is_numeric($value)) {
+            return false;
+        }
+        $value = (double)sprintf('%.4F', $value);
+        if ($value < 0.0000) {
+            return false;
+        }
+        return $value;
+    }
+
+    /**
      * Save import data batch
      *
      * @param array $data
@@ -379,7 +576,6 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         if (!empty($data)) {
             $columns = [
-                'shipping_method',
                 'website_id',
                 'dest_country_id',
                 'dest_region_id',
@@ -387,7 +583,10 @@ class Tablerate extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                 'condition_name',
                 'condition_value',
                 'price',
+                'cost',
+                'shipping_method',
             ];
+
             $this->getConnection()->insertArray($this->getMainTable(), $columns, $data);
             $this->_importedRows += count($data);
         }
