@@ -38,6 +38,13 @@ define([
 
         addRow: function() {
             var method = quote.shippingMethod();
+            
+             /**
+             * Removes parcelshop container when dpd method is not selected
+             */
+            if(method === null || (!(method === null) && method.carrier_code !== 'dpdpickup' && method.method_code !== 'dpdpickup')) {
+                $('#dpd_parcelshop_container').remove();
+            }
 
             if (!(method === null) && method.carrier_code === 'dpdpickup' && method.method_code === 'dpdpickup') {
                 $('#dpd_parcelshop_container').remove();
