@@ -11,7 +11,7 @@ define([
 
         return wrapper.wrap(shippingInformationAction, function (originalAction) {
             var selectedShippingMethod = quote.shippingMethod();
-            if (selectedShippingMethod.carrier_code === 'dpdpickup' && selectedShippingMethod.method_code === 'dpdpickup') {
+            if (selectedShippingMethod.carrier_code === 'dpdpickup' && selectedShippingMethod.method_code === 'dpdpickup' && window.oscRoute === undefined) {
                 var parcelShopId = $('.parcelshopId').val();
                 if (!parcelShopId) {
                     globalMessageList.addErrorMessage({ message: $t('You must select a parcelshop')});

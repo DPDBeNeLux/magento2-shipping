@@ -19,6 +19,9 @@
 var config = {
     config: {
         mixins: {
+            'Mageplaza_Osc/js/view/shipping': {
+                'DPDBenelux_Shipping/js/view/mageplaza-osc-shipping-mixin': true
+            },
             'Magento_Checkout/js/action/set-shipping-information': {
                 'DPDBenelux_Shipping/js/model/set-shipping-information-mixin': true
             }
