@@ -369,7 +369,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         #16402
         if (version_compare($context->getVersion(), '1.1.1') < 0) {
-            if (!$setup->getConnection()->tableColumnExists('dpd_shipment_label', 'label_path')) {
+            if (!$setup->getConnection()->tableColumnExists($setup->getTable('dpd_shipment_label'), 'label_path')) {
                 $setup->getConnection()->addColumn($setup->getTable('dpd_shipment_label'), 'label_path', [
                     'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                     'nullable'  => true,
