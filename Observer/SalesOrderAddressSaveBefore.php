@@ -84,6 +84,6 @@ class SalesOrderAddressSaveBefore implements ObserverInterface
         }
 
         // empty this otherwise you'd get customer data and DPD parcelshop data mixed up
-        $shippingAddress->setTelephone('');
+        $shippingAddress->setTelephone('-');
     }
 }
