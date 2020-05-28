@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 namespace DPDBenelux\Shipping\Setup;
- 
+
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -42,17 +42,17 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->startSetup();
 
         //handle all possible upgrade versions
- 
+
         if (!$context->getVersion()) {
             //no previous version found, installation, InstallSchema was just executed
             //be careful, since everything below is true for installation !
         }
- 
+
         $connection = $setup->getConnection();
- 
+
         if (version_compare($context->getVersion(), '1.0.2') < 0) {
             // Code to upgrade to 1.0.2
-            
+
             //#10796
             $senderStoreName = $this->scopeConfig->getValue('general/store_information/name');
             $senderStreetLine1 = $this->scopeConfig->getValue('general/store_information/street_line1');
@@ -380,5 +380,19 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
         $setup->endSetup();
+
+        #34
+        if (version_compare($context->getVersion(), '1.3.0') < 0) {
+            if (!$setup->getConnection()->tableColumnExists('dpd_shipping_tablerate', 'condition_name')) {
+                $setup->getConnection()->modifyColumn(
+                    $setup->getTable('dpd_shipping_tablerate'),
+                    'condition_name',
+                    [
+                        'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                        'nullable'  => false,
+                        'length'    => 50
+                    ]);
+            }
+        }
     }
 }
